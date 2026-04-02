@@ -79,6 +79,14 @@ server/app.py  (FastAPI — REST + WebSocket)
 - **Duplicate call** (-0.03): Calling the exact same tool with the same arguments twice
 - **No action** (-0.05): Taking a step without calling a tool or sending a message
 
+## 🧪 Benchmarking Validation Suite
+
+Judges/Evaluators can mathematically verify the RL reward function determinism using the isolated test suite:
+```bash
+uv run python test_benchmark.py
+```
+This script acts as a static "Oracle Agent" demonstrating the perfect sequence of fractional rewards leading up to `1.00` across all 6 scenarios.
+
 ## 🚀 Quick Start
 
 ### Install

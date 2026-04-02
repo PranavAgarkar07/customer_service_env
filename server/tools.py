@@ -405,5 +405,5 @@ def call_tool(tool_name: str, tool_args: Dict[str, Any]) -> Dict[str, Any]:
     fn = TOOL_REGISTRY[tool_name]
     try:
         return fn(**tool_args)
-    except TypeError as e:
-        return {"success": False, "error": f"Invalid arguments for '{tool_name}': {e}"}
+    except Exception as e:
+        return {"success": False, "error": f"Invalid arguments or tool execution failure for '{tool_name}': {e}"}
