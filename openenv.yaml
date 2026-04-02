@@ -1,0 +1,34 @@
+spec_version: 1
+name: customer_service_env
+type: space
+runtime: fastapi
+app: server.app:app
+port: 8000
+
+# Environment metadata
+description: >
+  A multi-step customer service simulation where RL agents resolve
+  customer queries using 6 tool APIs (verify_user, check_order, issue_refund,
+  check_policy, escalate_to_human, route_to_regional_team). Features deterministic partial rewards,
+  sequence bonuses, penalties for wrong actions, and edge cases like
+  cross-cultural handoffs and non-refundable items requiring escalation.
+
+tasks:
+  - id: easy_order_status
+    description: Customer asks for order status and tracking — 1 tool needed
+    difficulty: easy
+  - id: easy_order_cancel
+    description: Customer wants to cancel an unshipped order — 2 tools needed
+    difficulty: easy
+  - id: medium_refund_request
+    description: Customer requests a refund for defective item — 3 tools + sequence bonus
+    difficulty: medium
+  - id: hard_fraud_detection
+    description: Customer reports duplicate charge — 5+ tools, investigative reasoning
+    difficulty: hard
+  - id: hard_non_refundable
+    description: Customer wants refund for digital download (non-refundable) — requires escalation
+    difficulty: hard
+  - id: hard_multilingual
+    description: Customer query in Spanish - requires routing to regional team
+    difficulty: hard
