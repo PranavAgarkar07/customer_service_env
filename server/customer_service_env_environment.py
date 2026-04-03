@@ -354,11 +354,14 @@ class CustomerServiceEnvironment(Environment):
         return reward
 
     def _compute_message_reward(self, message: str) -> float:
-        """Compute reward for agent's message based on resolution keywords."""
+        """Compute reward for agent's message based on resolution keywords and politeness."""
         if not self._scenario:
             return 0.0
 
+        reward = 0.0
         msg_lower = message.lower()
+
+        # --- Resolution keyword matching ---
         keywords_found = sum(
             1 for kw in self._scenario.resolution_keywords
             if kw.lower() in msg_lower
@@ -369,12 +372,20 @@ class CustomerServiceEnvironment(Environment):
             max_msg_reward = self._scenario.partial_rewards.get(
                 "correct_info_in_message", 0.15
             )
-            reward = ratio * max_msg_reward
+            reward += ratio * max_msg_reward
             if ratio >= 0.5:
                 self._resolved = True
-            return reward
 
-        return 0.0
+        # --- Polite response reward: using customer's name ---
+        polite_reward = self._scenario.partial_rewards.get("polite_response", 0.0)
+        if polite_reward > 0:
+            customer_first_name = self._scenario.customer_name.split()[0].lower()
+            if customer_first_name in msg_lower:
+                reward += polite_reward
+                # Only award once — zero out so it's not given again
+                self._scenario.partial_rewards["polite_response"] = 0.0
+
+        return reward
 
     def _check_done(self) -> bool:
         """Check if the episode should end."""
