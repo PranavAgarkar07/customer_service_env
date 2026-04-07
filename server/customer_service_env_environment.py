@@ -70,6 +70,7 @@ class CustomerServiceEnvironment(Environment):
         self._tool_calls_detail: List[Dict[str, Any]] = []  # (tool_name, args) for duplicate detection
         self._tool_results: List[Dict[str, Any]] = []
         self._total_reward: float = 0.0
+        self._yielded_reward: float = 0.0
         self._user_verified: bool = False
         self._orders_checked: List[str] = []
         self._refund_issued: bool = False
@@ -102,6 +103,7 @@ class CustomerServiceEnvironment(Environment):
         self._tool_calls_detail = []
         self._tool_results = []
         self._total_reward = 0.0
+        self._yielded_reward = 0.0
         self._user_verified = False
         self._orders_checked = []
         self._refund_issued = False
@@ -240,9 +242,18 @@ class CustomerServiceEnvironment(Environment):
                 f"Steps used: {self._state.step_count}/{self.MAX_STEPS}."
             )
 
+        # Enforce strict bounds (0, 1) for the task score returned to OpenEnv
+        # OpenEnv computes task score as sum of step rewards.
+        target_total_yielded = self._total_reward
+        if done:
+            target_total_yielded = max(0.01, min(0.99, self._total_reward))
+            
+        step_reward_to_yield = target_total_yielded - getattr(self, '_yielded_reward', 0.0)
+        self._yielded_reward = getattr(self, '_yielded_reward', 0.0) + step_reward_to_yield
+
         return CustomerServiceObservation(
             done=done,
-            reward=round(step_reward, 4),
+            reward=round(step_reward_to_yield, 4),
             customer_query=self._scenario.customer_query if self._scenario else "",
             conversation_history=list(self._conversation),
             tool_result=tool_result,

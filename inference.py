@@ -268,13 +268,15 @@ async def run_scenario(client: OpenAI, env: CustomerServiceEnv, scenario_id: str
             if result.done:
                 break
 
-        total_score = min(max(sum(rewards), 0.0), 1.0)
-        success = total_score >= 0.3
+        # Clamp strictly within (0, 1) — OpenEnv Phase 2 requires 0 < score < 1
+        raw_score = sum(rewards)
+        total_score = max(0.01, min(0.99, raw_score))
+        success = raw_score >= 0.3
 
     except Exception as e:
         print(f"[DEBUG] Scenario error: {e}", flush=True)
         success = False
-        total_score = 0.0
+        total_score = 0.01  # Minimum valid score — must be strictly > 0
 
     finally:
         log_end(success=success, steps=steps_taken, score=total_score, rewards=rewards)
