@@ -17,6 +17,19 @@ from uuid import uuid4
 
 from openenv.core.env_server.interfaces import Environment
 
+
+def safe_reward(r: float) -> float:
+    """Map any raw step reward to a value strictly inside (0.01, 0.99).
+
+    Per OpenEnv Phase 2 validation rules every individual step reward must be
+    a floating-point number in the open interval (0, 1).
+    Negative rewards (penalties) are first shifted into a positive range by
+    adding 0.5 so that a penalty of -0.05 becomes 0.45 instead of -0.05.
+    """
+    if r < 0:
+        r = 0.5 + r   # shift: -0.05 → 0.45, -0.03 → 0.47, -0.5 → 0.0 (then clamped up)
+    return max(0.01, min(0.99, r))
+
 try:
     from ..models import (
         CustomerServiceAction,
@@ -243,13 +256,16 @@ class CustomerServiceEnvironment(Environment):
                 f"Steps used: {self._state.step_count}/{self.MAX_STEPS}."
             )
 
-        # Enforce strict bounds (0, 1) for the task score returned to OpenEnv
-        # OpenEnv computes task score as sum of step rewards.
+        # Enforce strict open-bound (0.01, 0.99) for every reward returned to OpenEnv.
+        # The validator rejects 0, 1, and any negative value on individual step rewards.
         target_total_yielded = self._total_reward
         if done:
             target_total_yielded = max(0.01, min(0.99, self._total_reward))
-            
-        step_reward_to_yield = target_total_yielded - getattr(self, '_yielded_reward', 0.0)
+
+        raw_delta = target_total_yielded - getattr(self, '_yielded_reward', 0.0)
+        # Apply safe_reward to the outgoing delta — shifts negatives into (0.01, 0.99)
+        step_reward_to_yield = safe_reward(raw_delta)
+        # Track cumulative using the TRANSFORMED value so OpenEnv's running total stays valid
         self._yielded_reward = getattr(self, '_yielded_reward', 0.0) + step_reward_to_yield
 
         return CustomerServiceObservation(

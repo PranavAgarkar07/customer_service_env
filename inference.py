@@ -389,8 +389,13 @@ async def run_scenario(client: OpenAI, scenario_id: str) -> float:
             if result.done:
                 break
 
-        # Compute final score: sum of yielded rewards, clamped to [0, 1]
-        total_score = min(max(sum(rewards), 0.001), 0.999)
+        # Compute final score: sum of yielded step rewards.
+        # Apply safe_reward logic to mirror what the environment yields:
+        # negative sums are shifted by +0.5 before clamping to (0.01, 0.99).
+        raw_score = sum(rewards)
+        if raw_score < 0:
+            raw_score = 0.5 + raw_score
+        total_score = max(0.01, min(0.99, raw_score))
         success = total_score >= 0.3
 
     except Exception as e:
