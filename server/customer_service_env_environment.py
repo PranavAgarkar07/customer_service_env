@@ -232,6 +232,7 @@ class CustomerServiceEnvironment(Environment):
         # Update cumulative reward (clamp to [-0.5, 1.0])
         self._total_reward += step_reward
         self._total_reward = max(self._total_reward, -0.5)  # Floor at -0.5
+        self._total_reward = min(self._total_reward, 0.999)  # Ceiling at 0.999 — strict open bound, avoids Phase 2 validator rejection
         self._state.partial_score = max(self._total_reward, 0.0)  # State shows non-negative
 
         if done:

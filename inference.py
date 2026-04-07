@@ -3,17 +3,29 @@ Inference Script — Customer Service Agent Environment
 =====================================================
 
 MANDATORY ENV VARS:
-    API_BASE_URL   The API endpoint for the LLM.
-    MODEL_NAME     The model identifier to use for inference.
-    HF_TOKEN       Your Hugging Face / API key.
+    API_BASE_URL        The API endpoint for the LLM.
+    MODEL_NAME          The model identifier to use for inference.
+    HF_TOKEN            Your Hugging Face / API key.
+    LOCAL_IMAGE_NAME    The name of the local image to use for the environment
+                        if you are using from_docker_image() method.
 
 STDOUT FORMAT:
     [START] task=<task_name> env=<benchmark> model=<model_name>
     [STEP]  step=<n> action=<action_str> reward=<0.00> done=<true|false> error=<msg|null>
-    [END]   success=<true|false> steps=<n> rewards=<r1,r2,...,rn>
+    [END]   success=<true|false> steps=<n> score=<score> rewards=<r1,r2,...,rn>
+
+  Rules:
+    - One [START] line at episode begin.
+    - One [STEP] line per step, immediately after env.step() returns.
+    - One [END] line after env.close(), always emitted (even on exception).
+    - reward and rewards are formatted to 2 decimal places.
+    - done and success are lowercase booleans: true or false.
+    - error is the raw last_action_error string, or null if none.
+    - All fields on a single line with no newlines within a line.
 """
 
 import asyncio
+import concurrent.futures
 import json
 import os
 import textwrap
@@ -26,6 +38,10 @@ from openai import OpenAI
 
 from customer_service_env import CustomerServiceAction, CustomerServiceEnv
 
+# Thread pool for running blocking Ollama calls without blocking the asyncio event loop
+# (keeps WebSocket pongs alive during LLM inference)
+_LLM_EXECUTOR = concurrent.futures.ThreadPoolExecutor(max_workers=2)
+
 # =============================================================================
 # Configuration
 # =============================================================================
@@ -36,7 +52,12 @@ HF_TOKEN = os.getenv("HF_TOKEN")
 API_KEY = os.getenv("OPENAI_API_KEY") or HF_TOKEN
 API_BASE_URL = os.getenv("API_BASE_URL", "https://router.huggingface.co/v1")
 MODEL_NAME = os.getenv("MODEL_NAME", "Qwen/Qwen2.5-72B-Instruct")
-IMAGE_NAME = os.getenv("IMAGE_NAME", "customer_service_env:latest")
+IMAGE_NAME = os.getenv("LOCAL_IMAGE_NAME", os.getenv("IMAGE_NAME", "customer_service_env:latest"))
+
+# Direct URL to the already-running environment container.
+# Using from_docker_image() would try to start a NEW container, which fails when
+# port 8000 is already occupied. Connecting by URL skips container lifecycle management.
+ENV_BASE_URL = os.getenv("ENV_BASE_URL", "http://localhost:8000")
 
 BENCHMARK = "customer_service_env"
 MAX_STEPS = 12
@@ -136,36 +157,54 @@ ANTI-LOOP RULES:
 
 
 # =============================================================================
-# Logging Helpers
+# Logging Helpers  (spec-compliant stdout format)
 # =============================================================================
 
 def log_start(task: str, env: str, model: str) -> None:
+    """Emit exactly one [START] line at episode begin."""
     print(f"[START] task={task} env={env} model={model}", flush=True)
 
 
 def log_step(step: int, action: str, reward: float, done: bool, error: Optional[str]) -> None:
+    """Emit exactly one [STEP] line immediately after env.step() returns.
+
+    - reward formatted to 2 decimal places.
+    - done is a lowercase boolean string.
+    - error is the raw last_action_error string, or 'null' if none.
+    """
     error_val = error if error else "null"
     done_val = str(done).lower()
-    print(f"[STEP] step={step} action={action} reward={reward:.2f} done={done_val} error={error_val}", flush=True)
+    print(
+        f"[STEP] step={step} action={action} reward={reward:.2f} done={done_val} error={error_val}",
+        flush=True,
+    )
 
 
 def log_end(success: bool, steps: int, score: float, rewards: List[float]) -> None:
+    """Emit exactly one [END] line after env.close(), always (even on exception).
+
+    - rewards formatted to 2 decimal places, comma-separated.
+    - score formatted to 2 decimal places.
+    - success is a lowercase boolean string.
+    """
     rewards_str = ",".join(f"{r:.2f}" for r in rewards)
-    print(f"[END] success={str(success).lower()} steps={steps} score={score:.3f} rewards={rewards_str}", flush=True)
+    print(
+        f"[END] success={str(success).lower()} steps={steps} score={score:.2f} rewards={rewards_str}",
+        flush=True,
+    )
 
 
 # =============================================================================
 # LLM Interaction
 # =============================================================================
 
-def get_agent_action(
+def _call_llm_sync(
     client: OpenAI,
     conversation: List[Dict[str, str]],
     tool_result: Optional[Dict[str, Any]],
     feedback: str,
 ) -> Dict[str, Any]:
-    """Ask the LLM to decide the next action."""
-
+    """Synchronous LLM call — runs in a thread pool to keep asyncio free."""
     user_content = f"Environment feedback: {feedback}\n"
     if tool_result:
         user_content += f"Last tool result: {json.dumps(tool_result)}\n"
@@ -207,21 +246,93 @@ def get_agent_action(
         return {"tool_name": None, "tool_args": {}, "message": "I apologize, let me help you."}
 
 
+async def get_agent_action(
+    client: OpenAI,
+    conversation: List[Dict[str, str]],
+    tool_result: Optional[Dict[str, Any]],
+    feedback: str,
+) -> Dict[str, Any]:
+    """Ask the LLM to decide the next action (async wrapper to keep WS alive).
+
+    Runs the blocking OpenAI/Ollama call in a thread pool executor so the
+    asyncio event loop stays free to handle WebSocket keepalive pings.
+    Without this, a slow local LLM (>20 s) would cause the server to time
+    out the WebSocket connection with error 1011.
+    """
+    loop = asyncio.get_event_loop()
+    return await loop.run_in_executor(
+        _LLM_EXECUTOR,
+        _call_llm_sync,
+        client,
+        conversation,
+        tool_result,
+        feedback,
+    )
+
+
+# =============================================================================
+# Error extraction helper
+# =============================================================================
+
+def _extract_error(feedback: str) -> Optional[str]:
+    """Extract a last_action_error string from the environment feedback, or None.
+
+    The environment encodes penalty/error messages in the feedback string.
+    We surface them as the 'error' field in [STEP] lines per the spec:
+      error is the raw last_action_error string, or null if none.
+    """
+    if not feedback:
+        return None
+    lowered = feedback.lower()
+    # Penalty / error indicators set by the environment
+    error_signals = (
+        "penalty",
+        "duplicate tool call",
+        "not needed for this scenario",
+        "failed:",
+        "no action taken",
+        "warning:",
+    )
+    for signal in error_signals:
+        if signal in lowered:
+            # Return the first sentence of the feedback as the error string,
+            # sanitised to a single line (spec: no newlines within a line).
+            first_sentence = feedback.split("|")[0].strip().replace("\n", " ")
+            return first_sentence
+    return None
+
+
 # =============================================================================
 # Main Inference Loop
 # =============================================================================
 
-async def run_scenario(client: OpenAI, env: CustomerServiceEnv, scenario_id: str) -> float:
-    """Run a single scenario and return the total score."""
+async def run_scenario(client: OpenAI, scenario_id: str) -> float:
+    """Run a single scenario with its own fresh WebSocket connection.
+
+    A fresh connection per scenario avoids cross-scenario keepalive timeouts:
+    the server drops idle WebSocket connections after ~20 s, so if LLM
+    inference for one scenario takes long the NEXT scenario's reset would
+    fail on the same connection.
+
+    Stdout contract (spec):
+      [START]  — emitted once, before the loop.
+      [STEP]   — emitted once per step, immediately after env.step().
+      [END]    — emitted once after env.close() / env.disconnect(), always.
+    """
     task_name = scenario_id
     rewards: List[float] = []
     steps_taken = 0
     total_score = 0.0
     success = False
 
+    # ── [START] ──────────────────────────────────────────────────────────────
     log_start(task=task_name, env=BENCHMARK, model=MODEL_NAME)
 
+    # Open a brand-new WebSocket session just for this scenario
+    env = CustomerServiceEnv(base_url=ENV_BASE_URL)
     try:
+        await env.connect()
+
         result = await env.reset(scenario_id=scenario_id)
         obs = result.observation
         tool_result = None
@@ -230,8 +341,8 @@ async def run_scenario(client: OpenAI, env: CustomerServiceEnv, scenario_id: str
             if result.done:
                 break
 
-            # Get LLM decision
-            action_dict = get_agent_action(
+            # Get LLM decision — runs in thread pool so WS pings are handled
+            action_dict = await get_agent_action(
                 client,
                 obs.conversation_history,
                 tool_result,
@@ -263,59 +374,72 @@ async def run_scenario(client: OpenAI, env: CustomerServiceEnv, scenario_id: str
                 action_str += f" msg='{short_msg}'"
             action_str = action_str.strip() or "noop"
 
-            log_step(step=step, action=action_str, reward=reward, done=result.done, error=None)
+            # Extract last_action_error per spec: null if no error/penalty
+            error_str = _extract_error(obs.feedback)
+
+            # ── [STEP] ───────────────────────────────────────────────────────
+            log_step(
+                step=step,
+                action=action_str,
+                reward=reward,
+                done=result.done,
+                error=error_str,
+            )
 
             if result.done:
                 break
 
-        # Clamp strictly within (0, 1) — OpenEnv Phase 2 requires 0 < score < 1
-        raw_score = sum(rewards)
-        total_score = max(0.01, min(0.99, raw_score))
-        success = raw_score >= 0.3
+        # Compute final score: sum of yielded rewards, clamped to [0, 1]
+        total_score = min(max(sum(rewards), 0.001), 0.999)
+        success = total_score >= 0.3
 
     except Exception as e:
         print(f"[DEBUG] Scenario error: {e}", flush=True)
         success = False
-        total_score = 0.01  # Minimum valid score — must be strictly > 0
+        total_score = 0.0
 
     finally:
+        # Disconnect first, then emit [END] — spec: "after env.close(), always emitted"
+        try:
+            await env.disconnect()
+        except Exception:
+            pass
+
+        # ── [END] ────────────────────────────────────────────────────────────
         log_end(success=success, steps=steps_taken, score=total_score, rewards=rewards)
 
     return total_score
 
 
 async def main() -> None:
-    """Run inference across all three scenarios."""
+    """Run inference across all scenarios.
+
+    Each scenario gets its own fresh WebSocket connection (see run_scenario).
+    The Docker container at ENV_BASE_URL must already be running.
+    """
     client = OpenAI(base_url=API_BASE_URL, api_key=API_KEY)
 
-    # Connect to the environment
-    env = await CustomerServiceEnv.from_docker_image(IMAGE_NAME)
+    # Verify the environment server is reachable before starting
+    print(f"Connecting to environment at: {ENV_BASE_URL}", flush=True)
+    print(f"Using model: {MODEL_NAME} via {API_BASE_URL}", flush=True)
 
     scores = {}
-    try:
-        for scenario_id in SCENARIOS:
-            print(f"\n{'='*60}", flush=True)
-            print(f"Running scenario: {scenario_id}", flush=True)
-            print(f"{'='*60}", flush=True)
-
-            score = await run_scenario(client, env, scenario_id)
-            scores[scenario_id] = score
-
-        # Print summary
+    for scenario_id in SCENARIOS:
         print(f"\n{'='*60}", flush=True)
-        print("FINAL SUMMARY", flush=True)
+        print(f"Running scenario: {scenario_id}", flush=True)
         print(f"{'='*60}", flush=True)
-        for sid, score in scores.items():
-            print(f"  {sid}: {score:.3f}", flush=True)
-        avg = sum(scores.values()) / len(scores) if scores else 0.0
-        print(f"  Average: {avg:.3f}", flush=True)
 
-    finally:
-        try:
-            # Ignore non-fatal cleanup errors (e.g. docker stop timeout)
-            await env.close()
-        except Exception:
-            pass
+        score = await run_scenario(client, scenario_id)
+        scores[scenario_id] = score
+
+    # Print summary
+    print(f"\n{'='*60}", flush=True)
+    print("FINAL SUMMARY", flush=True)
+    print(f"{'='*60}", flush=True)
+    for sid, score in scores.items():
+        print(f"  {sid}: {score:.3f}", flush=True)
+    avg = sum(scores.values()) / len(scores) if scores else 0.0
+    print(f"  Average: {avg:.3f}", flush=True)
 
 
 if __name__ == "__main__":
