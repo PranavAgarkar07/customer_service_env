@@ -222,6 +222,7 @@ def _call_llm_sync(
             ],
             temperature=TEMPERATURE,
             max_tokens=MAX_TOKENS,
+            timeout=45,  # Hard timeout: fail fast rather than hang indefinitely
         )
         raw = (completion.choices[0].message.content or "").strip()
 
@@ -255,20 +256,28 @@ async def get_agent_action(
 ) -> Dict[str, Any]:
     """Ask the LLM to decide the next action (async wrapper to keep WS alive).
 
-    Runs the blocking OpenAI/Ollama call in a thread pool executor so the
-    asyncio event loop stays free to handle WebSocket keepalive pings.
-    Without this, a slow local LLM (>20 s) would cause the server to time
-    out the WebSocket connection with error 1011.
+    Runs the blocking OpenAI call in a thread pool executor so the asyncio
+    event loop stays free to handle WebSocket keepalive pings.
+    A 60-second asyncio timeout wraps the executor call to ensure the script
+    never hangs indefinitely if the API stops responding.
     """
     loop = asyncio.get_event_loop()
-    return await loop.run_in_executor(
-        _LLM_EXECUTOR,
-        _call_llm_sync,
-        client,
-        conversation,
-        tool_result,
-        feedback,
-    )
+    try:
+        return await asyncio.wait_for(
+            loop.run_in_executor(
+                _LLM_EXECUTOR,
+                _call_llm_sync,
+                client,
+                conversation,
+                tool_result,
+                feedback,
+            ),
+            timeout=60.0,  # Give up and return a safe fallback after 60s
+        )
+    except asyncio.TimeoutError:
+        import sys
+        print("[DEBUG] LLM call timed out after 60s — using fallback action", flush=True, file=sys.stderr)
+        return {"tool_name": None, "tool_args": {}, "message": "I apologize for the delay. Let me assist you."}
 
 
 # =============================================================================
