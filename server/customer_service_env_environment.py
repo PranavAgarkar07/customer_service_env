@@ -81,7 +81,7 @@ class CustomerServiceEnvironment(Environment):
     - hard_non_refundable: 5 tools, handle non-refundable + escalate
     """
 
-    SUPPORTS_CONCURRENT_SESSIONS: bool = True
+    SUPPORTS_CONCURRENT_SESSIONS: bool = False
     MAX_STEPS: int = 15
 
     def __init__(self):

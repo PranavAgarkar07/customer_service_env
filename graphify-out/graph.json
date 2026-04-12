@@ -9,7 +9,7 @@
       "source_file": "__init__.py",
       "source_location": "L1",
       "id": "init_py",
-      "community": 13
+      "community": 10
     },
     {
       "label": "client.py",
@@ -17,7 +17,7 @@
       "source_file": "client.py",
       "source_location": "L1",
       "id": "client_py",
-      "community": 4
+      "community": 0
     },
     {
       "label": "CustomerServiceEnv",
@@ -25,7 +25,7 @@
       "source_file": "client.py",
       "source_location": "L17",
       "id": "client_customerserviceenv",
-      "community": 4
+      "community": 0
     },
     {
       "label": "._step_payload()",
@@ -33,7 +33,7 @@
       "source_file": "client.py",
       "source_location": "L35",
       "id": "client_customerserviceenv_step_payload",
-      "community": 4
+      "community": 0
     },
     {
       "label": "._parse_result()",
@@ -41,15 +41,15 @@
       "source_file": "client.py",
       "source_location": "L45",
       "id": "client_customerserviceenv_parse_result",
-      "community": 4
+      "community": 0
     },
     {
       "label": "._parse_state()",
       "file_type": "code",
       "source_file": "client.py",
-      "source_location": "L70",
+      "source_location": "L76",
       "id": "client_customerserviceenv_parse_state",
-      "community": 4
+      "community": 0
     },
     {
       "label": "Client for the Customer Service Agent Environment.      Example:         >>> wit",
@@ -57,7 +57,7 @@
       "source_file": "client.py",
       "source_location": "L20",
       "id": "client_rationale_20",
-      "community": 4
+      "community": 0
     },
     {
       "label": "Convert action to JSON payload.",
@@ -65,7 +65,7 @@
       "source_file": "client.py",
       "source_location": "L36",
       "id": "client_rationale_36",
-      "community": 4
+      "community": 0
     },
     {
       "label": "Parse server response into StepResult.",
@@ -73,15 +73,15 @@
       "source_file": "client.py",
       "source_location": "L46",
       "id": "client_rationale_46",
-      "community": 4
+      "community": 0
     },
     {
       "label": "Parse server response into State object.",
       "file_type": "rationale",
       "source_file": "client.py",
-      "source_location": "L71",
-      "id": "client_rationale_71",
-      "community": 4
+      "source_location": "L77",
+      "id": "client_rationale_77",
+      "community": 0
     },
     {
       "label": "models.py",
@@ -89,15 +89,15 @@
       "source_file": "models.py",
       "source_location": "L1",
       "id": "models_py",
-      "community": 9
+      "community": 0
     },
     {
       "label": "CustomerServiceAction",
       "file_type": "code",
       "source_file": "models.py",
-      "source_location": "L21",
+      "source_location": "L22",
       "id": "models_customerserviceaction",
-      "community": 4
+      "community": 0
     },
     {
       "label": "Action",
@@ -105,23 +105,23 @@
       "source_file": "",
       "source_location": "",
       "id": "action",
-      "community": 4
+      "community": 0
     },
     {
       "label": "validate_tool_args()",
       "file_type": "code",
       "source_file": "models.py",
-      "source_location": "L45",
+      "source_location": "L46",
       "id": "models_validate_tool_args",
-      "community": 9
+      "community": 0
     },
     {
       "label": "CustomerServiceObservation",
       "file_type": "code",
       "source_file": "models.py",
-      "source_location": "L70",
+      "source_location": "L71",
       "id": "models_customerserviceobservation",
-      "community": 9
+      "community": 0
     },
     {
       "label": "Observation",
@@ -129,15 +129,23 @@
       "source_file": "",
       "source_location": "",
       "id": "observation",
-      "community": 9
+      "community": 0
+    },
+    {
+      "label": "clamp_reward()",
+      "file_type": "code",
+      "source_file": "models.py",
+      "source_location": "L82",
+      "id": "models_clamp_reward",
+      "community": 0
     },
     {
       "label": "CustomerServiceState",
       "file_type": "code",
       "source_file": "models.py",
-      "source_location": "L99",
+      "source_location": "L123",
       "id": "models_customerservicestate",
-      "community": 8
+      "community": 0
     },
     {
       "label": "State",
@@ -145,39 +153,47 @@
       "source_file": "",
       "source_location": "",
       "id": "state",
-      "community": 8
+      "community": 0
     },
     {
       "label": "Action the agent takes each step.      The agent can:     - Call a tool by setti",
       "file_type": "rationale",
       "source_file": "models.py",
-      "source_location": "L22",
-      "id": "models_rationale_22",
-      "community": 4
+      "source_location": "L23",
+      "id": "models_rationale_23",
+      "community": 0
     },
     {
       "label": "Convert string JSON or partial JSON to a dictionary.",
       "file_type": "rationale",
       "source_file": "models.py",
-      "source_location": "L46",
-      "id": "models_rationale_46",
-      "community": 14
+      "source_location": "L47",
+      "id": "models_rationale_47",
+      "community": 11
     },
     {
       "label": "Observation the agent receives after each step.      Contains the customer query",
       "file_type": "rationale",
       "source_file": "models.py",
-      "source_location": "L71",
-      "id": "models_rationale_71",
-      "community": 9
+      "source_location": "L72",
+      "id": "models_rationale_72",
+      "community": 0
+    },
+    {
+      "label": "Ultimate defense-in-depth against OOB task scores.                  The OpenEnv",
+      "file_type": "rationale",
+      "source_file": "models.py",
+      "source_location": "L83",
+      "id": "models_rationale_83",
+      "community": 12
     },
     {
       "label": "Internal state tracking for the customer service environment.",
       "file_type": "rationale",
       "source_file": "models.py",
-      "source_location": "L100",
-      "id": "models_rationale_100",
-      "community": 8
+      "source_location": "L124",
+      "id": "models_rationale_124",
+      "community": 0
     },
     {
       "label": "inference.py",
@@ -185,7 +201,7 @@
       "source_file": "inference.py",
       "source_location": "L1",
       "id": "inference_py",
-      "community": 1
+      "community": 2
     },
     {
       "label": "log_start()",
@@ -193,7 +209,7 @@
       "source_file": "inference.py",
       "source_location": "L170",
       "id": "inference_log_start",
-      "community": 1
+      "community": 2
     },
     {
       "label": "log_step()",
@@ -201,7 +217,7 @@
       "source_file": "inference.py",
       "source_location": "L175",
       "id": "inference_log_step",
-      "community": 1
+      "community": 2
     },
     {
       "label": "log_end()",
@@ -209,47 +225,47 @@
       "source_file": "inference.py",
       "source_location": "L190",
       "id": "inference_log_end",
-      "community": 1
+      "community": 2
     },
     {
       "label": "_call_llm_sync()",
       "file_type": "code",
       "source_file": "inference.py",
-      "source_location": "L208",
+      "source_location": "L209",
       "id": "inference_call_llm_sync",
-      "community": 1
+      "community": 2
     },
     {
       "label": "get_agent_action()",
       "file_type": "code",
       "source_file": "inference.py",
-      "source_location": "L265",
+      "source_location": "L266",
       "id": "inference_get_agent_action",
-      "community": 1
+      "community": 2
     },
     {
       "label": "_extract_error()",
       "file_type": "code",
       "source_file": "inference.py",
-      "source_location": "L303",
+      "source_location": "L304",
       "id": "inference_extract_error",
-      "community": 1
+      "community": 2
     },
     {
       "label": "run_scenario()",
       "file_type": "code",
       "source_file": "inference.py",
-      "source_location": "L335",
+      "source_location": "L336",
       "id": "inference_run_scenario",
-      "community": 1
+      "community": 2
     },
     {
       "label": "main()",
       "file_type": "code",
       "source_file": "inference.py",
-      "source_location": "L448",
+      "source_location": "L453",
       "id": "inference_main",
-      "community": 1
+      "community": 2
     },
     {
       "label": "Inference Script \u2014 Customer Service Agent Environment ==========================",
@@ -257,7 +273,7 @@
       "source_file": "inference.py",
       "source_location": "L1",
       "id": "inference_rationale_1",
-      "community": 1
+      "community": 2
     },
     {
       "label": "Emit exactly one [START] line at episode begin.",
@@ -265,7 +281,7 @@
       "source_file": "inference.py",
       "source_location": "L171",
       "id": "inference_rationale_171",
-      "community": 1
+      "community": 2
     },
     {
       "label": "Emit exactly one [STEP] line immediately after env.step() returns.      - reward",
@@ -273,7 +289,7 @@
       "source_file": "inference.py",
       "source_location": "L176",
       "id": "inference_rationale_176",
-      "community": 1
+      "community": 2
     },
     {
       "label": "Emit exactly one [END] line after env.close(), always (even on exception).",
@@ -281,47 +297,47 @@
       "source_file": "inference.py",
       "source_location": "L191",
       "id": "inference_rationale_191",
-      "community": 1
+      "community": 2
     },
     {
       "label": "Synchronous LLM call \u2014 runs in a thread pool to keep asyncio free.",
       "file_type": "rationale",
       "source_file": "inference.py",
-      "source_location": "L215",
-      "id": "inference_rationale_215",
-      "community": 1
+      "source_location": "L216",
+      "id": "inference_rationale_216",
+      "community": 2
     },
     {
       "label": "Ask the LLM to decide the next action (async wrapper to keep WS alive).      Run",
       "file_type": "rationale",
       "source_file": "inference.py",
-      "source_location": "L272",
-      "id": "inference_rationale_272",
-      "community": 1
+      "source_location": "L273",
+      "id": "inference_rationale_273",
+      "community": 2
     },
     {
       "label": "Extract a last_action_error string from the environment feedback, or None.",
       "file_type": "rationale",
       "source_file": "inference.py",
-      "source_location": "L304",
-      "id": "inference_rationale_304",
-      "community": 1
+      "source_location": "L305",
+      "id": "inference_rationale_305",
+      "community": 2
     },
     {
       "label": "Run a single scenario with its own fresh WebSocket connection.      A fresh conn",
       "file_type": "rationale",
       "source_file": "inference.py",
-      "source_location": "L336",
-      "id": "inference_rationale_336",
-      "community": 1
+      "source_location": "L337",
+      "id": "inference_rationale_337",
+      "community": 2
     },
     {
       "label": "Run inference across all scenarios.      Each scenario gets its own fresh WebSoc",
       "file_type": "rationale",
       "source_file": "inference.py",
-      "source_location": "L449",
-      "id": "inference_rationale_449",
-      "community": 1
+      "source_location": "L454",
+      "id": "inference_rationale_454",
+      "community": 2
     },
     {
       "label": "test_rewards_temp.py",
@@ -329,7 +345,7 @@
       "source_file": "test_rewards_temp.py",
       "source_location": "L1",
       "id": "test_rewards_temp_py",
-      "community": 11
+      "community": 8
     },
     {
       "label": "test_rewards()",
@@ -337,7 +353,7 @@
       "source_file": "test_rewards_temp.py",
       "source_location": "L5",
       "id": "test_rewards_temp_test_rewards",
-      "community": 11
+      "community": 8
     },
     {
       "label": "test_benchmark.py",
@@ -345,7 +361,7 @@
       "source_file": "test_benchmark.py",
       "source_location": "L1",
       "id": "test_benchmark_py",
-      "community": 12
+      "community": 9
     },
     {
       "label": "run_all_tests()",
@@ -353,7 +369,7 @@
       "source_file": "test_benchmark.py",
       "source_location": "L46",
       "id": "test_benchmark_run_all_tests",
-      "community": 12
+      "community": 9
     },
     {
       "label": "verify.py",
@@ -361,7 +377,7 @@
       "source_file": "verify.py",
       "source_location": "L1",
       "id": "verify_py",
-      "community": 7
+      "community": 6
     },
     {
       "label": "ok()",
@@ -369,7 +385,7 @@
       "source_file": "verify.py",
       "source_location": "L41",
       "id": "verify_ok",
-      "community": 7
+      "community": 6
     },
     {
       "label": "fail()",
@@ -377,7 +393,7 @@
       "source_file": "verify.py",
       "source_location": "L46",
       "id": "verify_fail",
-      "community": 7
+      "community": 6
     },
     {
       "label": "section()",
@@ -385,7 +401,7 @@
       "source_file": "verify.py",
       "source_location": "L53",
       "id": "verify_section",
-      "community": 7
+      "community": 6
     },
     {
       "label": "tier_static()",
@@ -393,7 +409,7 @@
       "source_file": "verify.py",
       "source_location": "L63",
       "id": "verify_tier_static",
-      "community": 7
+      "community": 6
     },
     {
       "label": "tier_oracle()",
@@ -401,7 +417,7 @@
       "source_file": "verify.py",
       "source_location": "L90",
       "id": "verify_tier_oracle",
-      "community": 7
+      "community": 6
     },
     {
       "label": "tier_http()",
@@ -409,7 +425,7 @@
       "source_file": "verify.py",
       "source_location": "L194",
       "id": "verify_tier_http",
-      "community": 7
+      "community": 6
     },
     {
       "label": "tier_openenv()",
@@ -417,7 +433,7 @@
       "source_file": "verify.py",
       "source_location": "L272",
       "id": "verify_tier_openenv",
-      "community": 7
+      "community": 6
     },
     {
       "label": "main()",
@@ -425,7 +441,7 @@
       "source_file": "verify.py",
       "source_location": "L319",
       "id": "verify_main",
-      "community": 7
+      "community": 6
     },
     {
       "label": "customer_service_env_environment.py",
@@ -433,7 +449,7 @@
       "source_file": "server/customer_service_env_environment.py",
       "source_location": "L1",
       "id": "server_customer_service_env_environment_py",
-      "community": 5
+      "community": 4
     },
     {
       "label": "safe_reward()",
@@ -441,7 +457,7 @@
       "source_file": "server/customer_service_env_environment.py",
       "source_location": "L21",
       "id": "customer_service_env_environment_safe_reward",
-      "community": 5
+      "community": 4
     },
     {
       "label": "CustomerServiceEnvironment",
@@ -449,7 +465,7 @@
       "source_file": "server/customer_service_env_environment.py",
       "source_location": "L62",
       "id": "customer_service_env_environment_customerserviceenvironment",
-      "community": 5
+      "community": 4
     },
     {
       "label": "Environment",
@@ -457,7 +473,7 @@
       "source_file": "",
       "source_location": "",
       "id": "environment",
-      "community": 5
+      "community": 4
     },
     {
       "label": ".__init__()",
@@ -465,7 +481,7 @@
       "source_file": "server/customer_service_env_environment.py",
       "source_location": "L87",
       "id": "customer_service_env_environment_customerserviceenvironment_init",
-      "community": 8
+      "community": 4
     },
     {
       "label": ".reset()",
@@ -473,7 +489,7 @@
       "source_file": "server/customer_service_env_environment.py",
       "source_location": "L97",
       "id": "customer_service_env_environment_customerserviceenvironment_reset",
-      "community": 8
+      "community": 4
     },
     {
       "label": ".step()",
@@ -481,7 +497,7 @@
       "source_file": "server/customer_service_env_environment.py",
       "source_location": "L153",
       "id": "customer_service_env_environment_customerserviceenvironment_step",
-      "community": 5
+      "community": 4
     },
     {
       "label": "state()",
@@ -489,7 +505,7 @@
       "source_file": "server/customer_service_env_environment.py",
       "source_location": "L247",
       "id": "customer_service_env_environment_state",
-      "community": 5
+      "community": 4
     },
     {
       "label": "._check_done_state_based()",
@@ -497,7 +513,7 @@
       "source_file": "server/customer_service_env_environment.py",
       "source_location": "L250",
       "id": "customer_service_env_environment_customerserviceenvironment_check_done_state_based",
-      "community": 5
+      "community": 4
     },
     {
       "label": "Map any raw reward to strictly inside (0.01, 0.99) using linear scaling.      Ma",
@@ -505,7 +521,7 @@
       "source_file": "server/customer_service_env_environment.py",
       "source_location": "L22",
       "id": "customer_service_env_environment_rationale_22",
-      "community": 5
+      "community": 4
     },
     {
       "label": "Customer Service Agent Environment.      The agent receives a customer query and",
@@ -513,7 +529,7 @@
       "source_file": "server/customer_service_env_environment.py",
       "source_location": "L63",
       "id": "customer_service_env_environment_rationale_63",
-      "community": 5
+      "community": 4
     },
     {
       "label": "Initialize the environment.",
@@ -521,7 +537,7 @@
       "source_file": "server/customer_service_env_environment.py",
       "source_location": "L88",
       "id": "customer_service_env_environment_rationale_88",
-      "community": 8
+      "community": 4
     },
     {
       "label": "Reset the environment with a generative scenario.",
@@ -529,7 +545,7 @@
       "source_file": "server/customer_service_env_environment.py",
       "source_location": "L104",
       "id": "customer_service_env_environment_rationale_104",
-      "community": 8
+      "community": 4
     },
     {
       "label": "Execute one step with outcome-based grading.",
@@ -537,7 +553,7 @@
       "source_file": "server/customer_service_env_environment.py",
       "source_location": "L159",
       "id": "customer_service_env_environment_rationale_159",
-      "community": 5
+      "community": 4
     },
     {
       "label": "__init__.py",
@@ -545,7 +561,7 @@
       "source_file": "server/__init__.py",
       "source_location": "L1",
       "id": "server_init_py",
-      "community": 15
+      "community": 13
     },
     {
       "label": "app.py",
@@ -553,7 +569,7 @@
       "source_file": "server/app.py",
       "source_location": "L1",
       "id": "server_app_py",
-      "community": 10
+      "community": 0
     },
     {
       "label": "health()",
@@ -561,7 +577,7 @@
       "source_file": "server/app.py",
       "source_location": "L63",
       "id": "app_health",
-      "community": 10
+      "community": 0
     },
     {
       "label": "main()",
@@ -569,7 +585,7 @@
       "source_file": "server/app.py",
       "source_location": "L68",
       "id": "app_main",
-      "community": 10
+      "community": 0
     },
     {
       "label": "Liveness probe \u2014 returns 200 OK when the server is ready.",
@@ -577,7 +593,7 @@
       "source_file": "server/app.py",
       "source_location": "L64",
       "id": "app_rationale_64",
-      "community": 10
+      "community": 0
     },
     {
       "label": "Run the server directly.",
@@ -585,7 +601,7 @@
       "source_file": "server/app.py",
       "source_location": "L69",
       "id": "app_rationale_69",
-      "community": 10
+      "community": 0
     },
     {
       "label": "tools.py",
@@ -593,7 +609,7 @@
       "source_file": "server/tools.py",
       "source_location": "L1",
       "id": "server_tools_py",
-      "community": 2
+      "community": 3
     },
     {
       "label": "verify_user()",
@@ -601,7 +617,7 @@
       "source_file": "server/tools.py",
       "source_location": "L224",
       "id": "tools_verify_user",
-      "community": 2
+      "community": 3
     },
     {
       "label": "check_order()",
@@ -609,7 +625,7 @@
       "source_file": "server/tools.py",
       "source_location": "L245",
       "id": "tools_check_order",
-      "community": 2
+      "community": 3
     },
     {
       "label": "issue_refund()",
@@ -617,7 +633,7 @@
       "source_file": "server/tools.py",
       "source_location": "L269",
       "id": "tools_issue_refund",
-      "community": 2
+      "community": 3
     },
     {
       "label": "check_policy()",
@@ -625,7 +641,7 @@
       "source_file": "server/tools.py",
       "source_location": "L310",
       "id": "tools_check_policy",
-      "community": 2
+      "community": 3
     },
     {
       "label": "escalate_to_human()",
@@ -633,7 +649,7 @@
       "source_file": "server/tools.py",
       "source_location": "L364",
       "id": "tools_escalate_to_human",
-      "community": 2
+      "community": 3
     },
     {
       "label": "route_to_regional_team()",
@@ -641,7 +657,7 @@
       "source_file": "server/tools.py",
       "source_location": "L379",
       "id": "tools_route_to_regional_team",
-      "community": 2
+      "community": 3
     },
     {
       "label": "call_tool()",
@@ -649,7 +665,7 @@
       "source_file": "server/tools.py",
       "source_location": "L413",
       "id": "tools_call_tool",
-      "community": 2
+      "community": 3
     },
     {
       "label": "Verify a user's identity and account status.",
@@ -657,7 +673,7 @@
       "source_file": "server/tools.py",
       "source_location": "L225",
       "id": "tools_rationale_225",
-      "community": 2
+      "community": 3
     },
     {
       "label": "Look up an order's details and status.",
@@ -665,7 +681,7 @@
       "source_file": "server/tools.py",
       "source_location": "L246",
       "id": "tools_rationale_246",
-      "community": 2
+      "community": 3
     },
     {
       "label": "Process a refund for an order.",
@@ -673,7 +689,7 @@
       "source_file": "server/tools.py",
       "source_location": "L270",
       "id": "tools_rationale_270",
-      "community": 2
+      "community": 3
     },
     {
       "label": "Look up company policy on a topic.",
@@ -681,7 +697,7 @@
       "source_file": "server/tools.py",
       "source_location": "L311",
       "id": "tools_rationale_311",
-      "community": 2
+      "community": 3
     },
     {
       "label": "Escalate the case to a human agent.",
@@ -689,7 +705,7 @@
       "source_file": "server/tools.py",
       "source_location": "L365",
       "id": "tools_rationale_365",
-      "community": 2
+      "community": 3
     },
     {
       "label": "Route the case to a specialized regional team.",
@@ -697,7 +713,7 @@
       "source_file": "server/tools.py",
       "source_location": "L380",
       "id": "tools_rationale_380",
-      "community": 2
+      "community": 3
     },
     {
       "label": "Dispatch a tool call and return the result.",
@@ -705,7 +721,7 @@
       "source_file": "server/tools.py",
       "source_location": "L414",
       "id": "tools_rationale_414",
-      "community": 2
+      "community": 3
     },
     {
       "label": "scenarios.py",
@@ -713,7 +729,7 @@
       "source_file": "server/scenarios.py",
       "source_location": "L1",
       "id": "server_scenarios_py",
-      "community": 6
+      "community": 7
     },
     {
       "label": "get_scenario()",
@@ -721,7 +737,7 @@
       "source_file": "server/scenarios.py",
       "source_location": "L45",
       "id": "scenarios_get_scenario",
-      "community": 6
+      "community": 7
     },
     {
       "label": "list_scenarios()",
@@ -729,7 +745,7 @@
       "source_file": "server/scenarios.py",
       "source_location": "L61",
       "id": "scenarios_list_scenarios",
-      "community": 6
+      "community": 7
     },
     {
       "label": "Get a procedurally generated scenario by ID or legacy alias.      Each call with",
@@ -737,7 +753,7 @@
       "source_file": "server/scenarios.py",
       "source_location": "L46",
       "id": "scenarios_rationale_46",
-      "community": 6
+      "community": 7
     },
     {
       "label": "List all available scenario IDs with metadata.",
@@ -745,7 +761,7 @@
       "source_file": "server/scenarios.py",
       "source_location": "L62",
       "id": "scenarios_rationale_62",
-      "community": 6
+      "community": 7
     },
     {
       "label": "tool_context.py",
@@ -753,7 +769,7 @@
       "source_file": "server/tool_context.py",
       "source_location": "L1",
       "id": "server_tool_context_py",
-      "community": 2
+      "community": 3
     },
     {
       "label": "ToolContext",
@@ -761,7 +777,7 @@
       "source_file": "server/tool_context.py",
       "source_location": "L5",
       "id": "tool_context_toolcontext",
-      "community": 2
+      "community": 3
     },
     {
       "label": "Session-local snapshot of databases for one episode.      Created fresh per epis",
@@ -769,7 +785,7 @@
       "source_file": "server/tool_context.py",
       "source_location": "L6",
       "id": "tool_context_rationale_6",
-      "community": 2
+      "community": 3
     },
     {
       "label": "reward_engine.py",
@@ -777,7 +793,7 @@
       "source_file": "server/reward_engine.py",
       "source_location": "L1",
       "id": "server_reward_engine_py",
-      "community": 3
+      "community": 5
     },
     {
       "label": "EpisodeStateProtocol",
@@ -785,7 +801,7 @@
       "source_file": "server/reward_engine.py",
       "source_location": "L10",
       "id": "reward_engine_episodestateprotocol",
-      "community": 3
+      "community": 5
     },
     {
       "label": "Protocol",
@@ -793,7 +809,7 @@
       "source_file": "",
       "source_location": "",
       "id": "protocol",
-      "community": 3
+      "community": 5
     },
     {
       "label": "ScenarioProtocol",
@@ -801,7 +817,7 @@
       "source_file": "server/reward_engine.py",
       "source_location": "L18",
       "id": "reward_engine_scenarioprotocol",
-      "community": 3
+      "community": 5
     },
     {
       "label": ".terminal_state_check()",
@@ -809,7 +825,7 @@
       "source_file": "server/reward_engine.py",
       "source_location": "L22",
       "id": "reward_engine_scenarioprotocol_terminal_state_check",
-      "community": 3
+      "community": 5
     },
     {
       "label": "RewardEngine",
@@ -817,7 +833,7 @@
       "source_file": "server/reward_engine.py",
       "source_location": "L26",
       "id": "reward_engine_rewardengine",
-      "community": 3
+      "community": 4
     },
     {
       "label": ".compute_step_reward()",
@@ -825,7 +841,7 @@
       "source_file": "server/reward_engine.py",
       "source_location": "L42",
       "id": "reward_engine_rewardengine_compute_step_reward",
-      "community": 3
+      "community": 5
     },
     {
       "label": ".compute_terminal_reward()",
@@ -833,7 +849,7 @@
       "source_file": "server/reward_engine.py",
       "source_location": "L74",
       "id": "reward_engine_rewardengine_compute_terminal_reward",
-      "community": 3
+      "community": 5
     },
     {
       "label": "Computes outcome-based and shaped rewards for the RL environment.      Design pr",
@@ -841,7 +857,7 @@
       "source_file": "server/reward_engine.py",
       "source_location": "L27",
       "id": "reward_engine_rationale_27",
-      "community": 3
+      "community": 4
     },
     {
       "label": "Shaped intermediate reward per step.          Provides a small positive signal f",
@@ -849,7 +865,7 @@
       "source_file": "server/reward_engine.py",
       "source_location": "L49",
       "id": "reward_engine_rationale_49",
-      "community": 3
+      "community": 5
     },
     {
       "label": "Outcome-based terminal reward using CustomerServiceRubric.          The rubric v",
@@ -857,7 +873,7 @@
       "source_file": "server/reward_engine.py",
       "source_location": "L81",
       "id": "reward_engine_rationale_81",
-      "community": 3
+      "community": 5
     },
     {
       "label": "scenario_generator.py",
@@ -865,7 +881,7 @@
       "source_file": "server/scenario_generator.py",
       "source_location": "L1",
       "id": "server_scenario_generator_py",
-      "community": 6
+      "community": 7
     },
     {
       "label": "GeneratedScenario",
@@ -873,7 +889,7 @@
       "source_file": "server/scenario_generator.py",
       "source_location": "L68",
       "id": "scenario_generator_generatedscenario",
-      "community": 6
+      "community": 4
     },
     {
       "label": "ScenarioGenerator",
@@ -881,7 +897,7 @@
       "source_file": "server/scenario_generator.py",
       "source_location": "L91",
       "id": "scenario_generator_scenariogenerator",
-      "community": 6
+      "community": 7
     },
     {
       "label": ".__init__()",
@@ -889,7 +905,7 @@
       "source_file": "server/scenario_generator.py",
       "source_location": "L92",
       "id": "scenario_generator_scenariogenerator_init",
-      "community": 6
+      "community": 7
     },
     {
       "label": ".generate()",
@@ -897,7 +913,7 @@
       "source_file": "server/scenario_generator.py",
       "source_location": "L96",
       "id": "scenario_generator_scenariogenerator_generate",
-      "community": 6
+      "community": 7
     },
     {
       "label": "rubrics.py",
@@ -905,7 +921,7 @@
       "source_file": "server/rubrics.py",
       "source_location": "L1",
       "id": "server_rubrics_py",
-      "community": 0
+      "community": 1
     },
     {
       "label": "BaseRubric",
@@ -913,7 +929,7 @@
       "source_file": "server/rubrics.py",
       "source_location": "L34",
       "id": "rubrics_baserubric",
-      "community": 0
+      "community": 1
     },
     {
       "label": ".score()",
@@ -921,7 +937,7 @@
       "source_file": "server/rubrics.py",
       "source_location": "L37",
       "id": "rubrics_baserubric_score",
-      "community": 0
+      "community": 1
     },
     {
       "label": "RefundMutationRubric",
@@ -929,7 +945,7 @@
       "source_file": "server/rubrics.py",
       "source_location": "L52",
       "id": "rubrics_refundmutationrubric",
-      "community": 0
+      "community": 1
     },
     {
       "label": ".score()",
@@ -937,7 +953,7 @@
       "source_file": "server/rubrics.py",
       "source_location": "L61",
       "id": "rubrics_refundmutationrubric_score",
-      "community": 0
+      "community": 1
     },
     {
       "label": "RoutingMutationRubric",
@@ -945,7 +961,7 @@
       "source_file": "server/rubrics.py",
       "source_location": "L74",
       "id": "rubrics_routingmutationrubric",
-      "community": 0
+      "community": 1
     },
     {
       "label": ".score()",
@@ -953,7 +969,7 @@
       "source_file": "server/rubrics.py",
       "source_location": "L82",
       "id": "rubrics_routingmutationrubric_score",
-      "community": 0
+      "community": 1
     },
     {
       "label": "EscalationRubric",
@@ -961,7 +977,7 @@
       "source_file": "server/rubrics.py",
       "source_location": "L100",
       "id": "rubrics_escalationrubric",
-      "community": 0
+      "community": 1
     },
     {
       "label": ".score()",
@@ -969,7 +985,7 @@
       "source_file": "server/rubrics.py",
       "source_location": "L108",
       "id": "rubrics_escalationrubric_score",
-      "community": 0
+      "community": 1
     },
     {
       "label": "OrderStatusRubric",
@@ -977,7 +993,7 @@
       "source_file": "server/rubrics.py",
       "source_location": "L117",
       "id": "rubrics_orderstatusrubric",
-      "community": 0
+      "community": 1
     },
     {
       "label": ".score()",
@@ -985,7 +1001,7 @@
       "source_file": "server/rubrics.py",
       "source_location": "L126",
       "id": "rubrics_orderstatusrubric_score",
-      "community": 0
+      "community": 1
     },
     {
       "label": "SequenceRubric",
@@ -993,7 +1009,7 @@
       "source_file": "server/rubrics.py",
       "source_location": "L150",
       "id": "rubrics_sequencerubric",
-      "community": 0
+      "community": 1
     },
     {
       "label": ".score()",
@@ -1001,7 +1017,7 @@
       "source_file": "server/rubrics.py",
       "source_location": "L158",
       "id": "rubrics_sequencerubric_score",
-      "community": 0
+      "community": 1
     },
     {
       "label": "MessageQualityRubric",
@@ -1009,7 +1025,7 @@
       "source_file": "server/rubrics.py",
       "source_location": "L196",
       "id": "rubrics_messagequalityrubric",
-      "community": 0
+      "community": 1
     },
     {
       "label": ".score()",
@@ -1017,7 +1033,7 @@
       "source_file": "server/rubrics.py",
       "source_location": "L206",
       "id": "rubrics_messagequalityrubric_score",
-      "community": 0
+      "community": 1
     },
     {
       "label": "CustomerServiceRubric",
@@ -1025,7 +1041,7 @@
       "source_file": "server/rubrics.py",
       "source_location": "L252",
       "id": "rubrics_customerservicerubric",
-      "community": 3
+      "community": 5
     },
     {
       "label": "for_scenario()",
@@ -1033,7 +1049,7 @@
       "source_file": "server/rubrics.py",
       "source_location": "L271",
       "id": "rubrics_for_scenario",
-      "community": 0
+      "community": 1
     },
     {
       "label": ".score()",
@@ -1041,7 +1057,7 @@
       "source_file": "server/rubrics.py",
       "source_location": "L289",
       "id": "rubrics_customerservicerubric_score",
-      "community": 3
+      "community": 5
     },
     {
       "label": "Abstract base for all rubrics.",
@@ -1049,7 +1065,7 @@
       "source_file": "server/rubrics.py",
       "source_location": "L35",
       "id": "rubrics_rationale_35",
-      "community": 0
+      "community": 1
     },
     {
       "label": "Return a score in [0.0, 1.0].",
@@ -1057,7 +1073,7 @@
       "source_file": "server/rubrics.py",
       "source_location": "L44",
       "id": "rubrics_rationale_44",
-      "community": 0
+      "community": 1
     },
     {
       "label": "Full credit only if ctx.refund_log contains the correct order_id.      This is t",
@@ -1065,7 +1081,7 @@
       "source_file": "server/rubrics.py",
       "source_location": "L53",
       "id": "rubrics_rationale_53",
-      "community": 0
+      "community": 1
     },
     {
       "label": "Full credit only if ctx.routing_log shows the customer was routed.      For mult",
@@ -1073,7 +1089,7 @@
       "source_file": "server/rubrics.py",
       "source_location": "L75",
       "id": "rubrics_rationale_75",
-      "community": 0
+      "community": 1
     },
     {
       "label": "Full credit if human escalation happened (state.escalated = True).      Used by",
@@ -1081,7 +1097,7 @@
       "source_file": "server/rubrics.py",
       "source_location": "L101",
       "id": "rubrics_rationale_101",
-      "community": 0
+      "community": 1
     },
     {
       "label": "Full credit if the agent checked the correct order.      Verifies the scenario's",
@@ -1089,7 +1105,7 @@
       "source_file": "server/rubrics.py",
       "source_location": "L118",
       "id": "rubrics_rationale_118",
-      "community": 0
+      "community": 1
     },
     {
       "label": "Score how closely the agent followed the required tool sequence.      Unlike a b",
@@ -1097,7 +1113,7 @@
       "source_file": "server/rubrics.py",
       "source_location": "L151",
       "id": "rubrics_rationale_151",
-      "community": 0
+      "community": 1
     },
     {
       "label": "Score the agent's final message for required resolution keywords.      Instead o",
@@ -1105,7 +1121,7 @@
       "source_file": "server/rubrics.py",
       "source_location": "L197",
       "id": "rubrics_rationale_197",
-      "community": 0
+      "community": 1
     },
     {
       "label": "Composite rubric that selects the right outcome + process + message rubrics",
@@ -1113,7 +1129,7 @@
       "source_file": "server/rubrics.py",
       "source_location": "L253",
       "id": "rubrics_rationale_253",
-      "community": 3
+      "community": 5
     },
     {
       "label": "Factory: return the right rubric mix for a given scenario type.",
@@ -1121,7 +1137,7 @@
       "source_file": "server/rubrics.py",
       "source_location": "L272",
       "id": "rubrics_rationale_272",
-      "community": 16
+      "community": 14
     },
     {
       "label": "Compute the weighted composite score in [0.0, 1.0].",
@@ -1129,7 +1145,7 @@
       "source_file": "server/rubrics.py",
       "source_location": "L296",
       "id": "rubrics_rationale_296",
-      "community": 3
+      "community": 5
     }
   ],
   "links": [
@@ -1173,7 +1189,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "client.py",
-      "source_location": "L70",
+      "source_location": "L76",
       "weight": 1.0,
       "_src": "client_customerserviceenv",
       "_tgt": "client_customerserviceenv_parse_state",
@@ -1257,12 +1273,12 @@
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "client.py",
-      "source_location": "L71",
+      "source_location": "L77",
       "weight": 1.0,
-      "_src": "client_rationale_71",
+      "_src": "client_rationale_77",
       "_tgt": "client_customerserviceenv_parse_state",
       "source": "client_customerserviceenv_parse_state",
-      "target": "client_rationale_71",
+      "target": "client_rationale_77",
       "confidence_score": 1.0
     },
     {
@@ -1379,9 +1395,9 @@
       "source_file": "client.py",
       "source_location": "L14",
       "weight": 0.8,
-      "_src": "client_rationale_71",
+      "_src": "client_rationale_77",
       "_tgt": "models_customerserviceaction",
-      "source": "client_rationale_71",
+      "source": "client_rationale_77",
       "target": "models_customerserviceaction",
       "confidence_score": 0.5
     },
@@ -1391,9 +1407,9 @@
       "source_file": "client.py",
       "source_location": "L14",
       "weight": 0.8,
-      "_src": "client_rationale_71",
+      "_src": "client_rationale_77",
       "_tgt": "models_customerserviceobservation",
-      "source": "client_rationale_71",
+      "source": "client_rationale_77",
       "target": "models_customerserviceobservation",
       "confidence_score": 0.5
     },
@@ -1403,9 +1419,9 @@
       "source_file": "client.py",
       "source_location": "L14",
       "weight": 0.8,
-      "_src": "client_rationale_71",
+      "_src": "client_rationale_77",
       "_tgt": "models_customerservicestate",
-      "source": "client_rationale_71",
+      "source": "client_rationale_77",
       "target": "models_customerservicestate",
       "confidence_score": 0.5
     },
@@ -1413,7 +1429,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "models.py",
-      "source_location": "L21",
+      "source_location": "L22",
       "weight": 1.0,
       "_src": "models_py",
       "_tgt": "models_customerserviceaction",
@@ -1425,7 +1441,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "models.py",
-      "source_location": "L45",
+      "source_location": "L46",
       "weight": 1.0,
       "_src": "models_py",
       "_tgt": "models_validate_tool_args",
@@ -1437,7 +1453,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "models.py",
-      "source_location": "L70",
+      "source_location": "L71",
       "weight": 1.0,
       "_src": "models_py",
       "_tgt": "models_customerserviceobservation",
@@ -1449,7 +1465,19 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "models.py",
-      "source_location": "L99",
+      "source_location": "L82",
+      "weight": 1.0,
+      "_src": "models_py",
+      "_tgt": "models_clamp_reward",
+      "source": "models_py",
+      "target": "models_clamp_reward",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "models.py",
+      "source_location": "L123",
       "weight": 1.0,
       "_src": "models_py",
       "_tgt": "models_customerservicestate",
@@ -1461,7 +1489,7 @@
       "relation": "inherits",
       "confidence": "EXTRACTED",
       "source_file": "models.py",
-      "source_location": "L21",
+      "source_location": "L22",
       "weight": 1.0,
       "_src": "models_customerserviceaction",
       "_tgt": "action",
@@ -1473,12 +1501,12 @@
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "models.py",
-      "source_location": "L22",
+      "source_location": "L23",
       "weight": 1.0,
-      "_src": "models_rationale_22",
+      "_src": "models_rationale_23",
       "_tgt": "models_customerserviceaction",
       "source": "models_customerserviceaction",
-      "target": "models_rationale_22",
+      "target": "models_rationale_23",
       "confidence_score": 1.0
     },
     {
@@ -1581,7 +1609,7 @@
       "relation": "inherits",
       "confidence": "EXTRACTED",
       "source_file": "models.py",
-      "source_location": "L70",
+      "source_location": "L71",
       "weight": 1.0,
       "_src": "models_customerserviceobservation",
       "_tgt": "observation",
@@ -1593,12 +1621,12 @@
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "models.py",
-      "source_location": "L71",
+      "source_location": "L72",
       "weight": 1.0,
-      "_src": "models_rationale_71",
+      "_src": "models_rationale_72",
       "_tgt": "models_customerserviceobservation",
       "source": "models_customerserviceobservation",
-      "target": "models_rationale_71",
+      "target": "models_rationale_72",
       "confidence_score": 1.0
     },
     {
@@ -1701,7 +1729,7 @@
       "relation": "inherits",
       "confidence": "EXTRACTED",
       "source_file": "models.py",
-      "source_location": "L99",
+      "source_location": "L123",
       "weight": 1.0,
       "_src": "models_customerservicestate",
       "_tgt": "state",
@@ -1713,12 +1741,12 @@
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "models.py",
-      "source_location": "L100",
+      "source_location": "L124",
       "weight": 1.0,
-      "_src": "models_rationale_100",
+      "_src": "models_rationale_124",
       "_tgt": "models_customerservicestate",
       "source": "models_customerservicestate",
-      "target": "models_rationale_100",
+      "target": "models_rationale_124",
       "confidence_score": 1.0
     },
     {
@@ -1833,7 +1861,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "inference.py",
-      "source_location": "L208",
+      "source_location": "L209",
       "weight": 1.0,
       "_src": "inference_py",
       "_tgt": "inference_call_llm_sync",
@@ -1845,7 +1873,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "inference.py",
-      "source_location": "L265",
+      "source_location": "L266",
       "weight": 1.0,
       "_src": "inference_py",
       "_tgt": "inference_get_agent_action",
@@ -1857,7 +1885,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "inference.py",
-      "source_location": "L303",
+      "source_location": "L304",
       "weight": 1.0,
       "_src": "inference_py",
       "_tgt": "inference_extract_error",
@@ -1869,7 +1897,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "inference.py",
-      "source_location": "L335",
+      "source_location": "L336",
       "weight": 1.0,
       "_src": "inference_py",
       "_tgt": "inference_run_scenario",
@@ -1881,7 +1909,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "inference.py",
-      "source_location": "L448",
+      "source_location": "L453",
       "weight": 1.0,
       "_src": "inference_py",
       "_tgt": "inference_main",
@@ -1905,7 +1933,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "inference.py",
-      "source_location": "L355",
+      "source_location": "L356",
       "weight": 1.0,
       "_src": "inference_run_scenario",
       "_tgt": "inference_log_start",
@@ -1929,7 +1957,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "inference.py",
-      "source_location": "L410",
+      "source_location": "L411",
       "weight": 1.0,
       "_src": "inference_run_scenario",
       "_tgt": "inference_log_step",
@@ -1953,7 +1981,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "inference.py",
-      "source_location": "L443",
+      "source_location": "L448",
       "weight": 1.0,
       "_src": "inference_run_scenario",
       "_tgt": "inference_log_end",
@@ -1977,19 +2005,19 @@
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "inference.py",
-      "source_location": "L215",
+      "source_location": "L216",
       "weight": 1.0,
-      "_src": "inference_rationale_215",
+      "_src": "inference_rationale_216",
       "_tgt": "inference_call_llm_sync",
       "source": "inference_call_llm_sync",
-      "target": "inference_rationale_215",
+      "target": "inference_rationale_216",
       "confidence_score": 1.0
     },
     {
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "inference.py",
-      "source_location": "L373",
+      "source_location": "L374",
       "weight": 1.0,
       "_src": "inference_run_scenario",
       "_tgt": "inference_get_agent_action",
@@ -2001,19 +2029,19 @@
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "inference.py",
-      "source_location": "L272",
+      "source_location": "L273",
       "weight": 1.0,
-      "_src": "inference_rationale_272",
+      "_src": "inference_rationale_273",
       "_tgt": "inference_get_agent_action",
       "source": "inference_get_agent_action",
-      "target": "inference_rationale_272",
+      "target": "inference_rationale_273",
       "confidence_score": 1.0
     },
     {
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "inference.py",
-      "source_location": "L407",
+      "source_location": "L408",
       "weight": 1.0,
       "_src": "inference_run_scenario",
       "_tgt": "inference_extract_error",
@@ -2025,19 +2053,19 @@
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "inference.py",
-      "source_location": "L304",
+      "source_location": "L305",
       "weight": 1.0,
-      "_src": "inference_rationale_304",
+      "_src": "inference_rationale_305",
       "_tgt": "inference_extract_error",
       "source": "inference_extract_error",
-      "target": "inference_rationale_304",
+      "target": "inference_rationale_305",
       "confidence_score": 1.0
     },
     {
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "inference.py",
-      "source_location": "L467",
+      "source_location": "L472",
       "weight": 1.0,
       "_src": "inference_main",
       "_tgt": "inference_run_scenario",
@@ -2049,24 +2077,24 @@
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "inference.py",
-      "source_location": "L336",
+      "source_location": "L337",
       "weight": 1.0,
-      "_src": "inference_rationale_336",
+      "_src": "inference_rationale_337",
       "_tgt": "inference_run_scenario",
       "source": "inference_run_scenario",
-      "target": "inference_rationale_336",
+      "target": "inference_rationale_337",
       "confidence_score": 1.0
     },
     {
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "inference.py",
-      "source_location": "L449",
+      "source_location": "L454",
       "weight": 1.0,
-      "_src": "inference_rationale_449",
+      "_src": "inference_rationale_454",
       "_tgt": "inference_main",
       "source": "inference_main",
-      "target": "inference_rationale_449",
+      "target": "inference_rationale_454",
       "confidence_score": 1.0
     },
     {
@@ -3417,7 +3445,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "server/scenario_generator.py",
-      "source_location": "L303",
+      "source_location": "L292",
       "weight": 1.0,
       "_src": "scenario_generator_scenariogenerator_generate",
       "_tgt": "scenario_generator_generatedscenario",

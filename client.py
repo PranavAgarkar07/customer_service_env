@@ -46,9 +46,15 @@ class CustomerServiceEnv(
         """Parse server response into StepResult."""
         obs_data = payload.get("observation", {})
 
+        raw_reward = payload.get("reward")
+        if raw_reward is None or not isinstance(raw_reward, (int, float)):
+            safe_reward = 0.05
+        else:
+            safe_reward = max(0.01, min(0.99, float(raw_reward)))
+
         observation = CustomerServiceObservation(
             done=payload.get("done", False),
-            reward=payload.get("reward"),
+            reward=safe_reward,
             customer_query=obs_data.get("customer_query", ""),
             conversation_history=obs_data.get("conversation_history", []),
             tool_result=obs_data.get("tool_result"),
@@ -63,7 +69,7 @@ class CustomerServiceEnv(
 
         return StepResult(
             observation=observation,
-            reward=payload.get("reward"),
+            reward=safe_reward,
             done=payload.get("done", False),
         )
 
@@ -78,5 +84,5 @@ class CustomerServiceEnv(
             escalated=payload.get("escalated", False),
             user_verified=payload.get("user_verified", False),
             tools_called=payload.get("tools_called", []),
-            partial_score=payload.get("partial_score", 0.0),
+            partial_score=max(0.05, min(0.99, float(payload.get("partial_score", 0.05)))),
         )

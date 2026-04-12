@@ -182,7 +182,7 @@ def log_step(step: int, action: str, reward: float, done: bool, error: Optional[
     error_val = error if error else "null"
     done_val = str(done).lower()
     print(
-        f"[STEP] step={step} action={action} reward={reward:.2f} done={done_val} error={error_val}",
+        f"[STEP] step={step} action={action} reward={reward:.4f} done={done_val} error={error_val}",
         flush=True,
     )
 
@@ -194,9 +194,10 @@ def log_end(success: bool, steps: int, score: float, rewards: List[float]) -> No
     - score formatted to 2 decimal places.
     - success is a lowercase boolean string.
     """
-    rewards_str = ",".join(f"{r:.2f}" for r in rewards)
+    rewards_str = ",".join(f"{r:.4f}" for r in rewards)
+    safe_score = min(max(float(score), 0.001), 0.999)
     print(
-        f"[END] success={str(success).lower()} steps={steps} score={score:.2f} rewards={rewards_str}",
+        f"[END] success={str(success).lower()} steps={steps} score={safe_score:.4f} rewards={rewards_str}",
         flush=True,
     )
 
@@ -429,8 +430,12 @@ async def run_scenario(client: OpenAI, scenario_id: str) -> float:
         import sys
         print(f"[DEBUG] Scenario error: {e}", flush=True, file=sys.stderr)
         success = False
+        import math
         # Clamp to 0.01 — never emit score=0.0 (fails Phase 2 open-interval check)
-        total_score = max(0.01, min(0.99, sum(rewards))) if rewards else 0.01
+        raw_rewards_sum = sum(rewards) if rewards else 0.01
+        if math.isnan(raw_rewards_sum) or math.isinf(raw_rewards_sum):
+            raw_rewards_sum = 0.01
+        total_score = max(0.01, min(0.99, raw_rewards_sum))
 
     finally:
         # Disconnect first, then emit [END] — spec: "after env.close(), always emitted"
