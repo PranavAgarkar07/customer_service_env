@@ -65,12 +65,12 @@ TEMPERATURE = 0.1
 MAX_TOKENS = 512
 
 SCENARIOS = [
-    "easy_order_status",
-    "easy_order_cancel",
-    "medium_refund_request",
-    "hard_fraud_detection",
-    "hard_non_refundable",
-    "hard_multilingual",
+    "order_status",
+    "order_cancel",
+    "refund_request",
+    "fraud_duplicate",
+    "non_refundable",
+    "multilingual",
 ]
 
 SYSTEM_PROMPT = textwrap.dedent("""

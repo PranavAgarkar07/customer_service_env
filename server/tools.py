@@ -11,7 +11,12 @@ Each tool returns deterministic mock data for reproducible grading.
 Tools: verify_user, check_order, issue_refund, check_policy, escalate_to_human
 """
 
-from typing import Any, Dict
+from typing import Any, Dict, Optional
+
+try:
+    from .tool_context import ToolContext
+except ImportError:
+    from server.tool_context import ToolContext
 
 # =============================================================================
 # Mock Databases
@@ -216,12 +221,13 @@ TOOL_DESCRIPTIONS = {
 }
 
 
-def verify_user(user_id: str = "", **kwargs) -> Dict[str, Any]:
+def verify_user(user_id: str = "", ctx: Optional[ToolContext] = None, **kwargs) -> Dict[str, Any]:
     """Verify a user's identity and account status."""
     if not user_id:
         return {"success": False, "error": "user_id is required"}
 
-    user = USERS_DB.get(user_id)
+    db = ctx.users_db if ctx else USERS_DB
+    user = db.get(user_id)
     if not user:
         return {"success": False, "error": f"User {user_id} not found"}
 
@@ -236,12 +242,13 @@ def verify_user(user_id: str = "", **kwargs) -> Dict[str, Any]:
     }
 
 
-def check_order(order_id: str = "", **kwargs) -> Dict[str, Any]:
+def check_order(order_id: str = "", ctx: Optional[ToolContext] = None, **kwargs) -> Dict[str, Any]:
     """Look up an order's details and status."""
     if not order_id:
         return {"success": False, "error": "order_id is required"}
 
-    order = ORDERS_DB.get(order_id)
+    db = ctx.orders_db if ctx else ORDERS_DB
+    order = db.get(order_id)
     if not order:
         return {"success": False, "error": f"Order {order_id} not found"}
 
@@ -259,14 +266,15 @@ def check_order(order_id: str = "", **kwargs) -> Dict[str, Any]:
     }
 
 
-def issue_refund(order_id: str = "", reason: str = "", **kwargs) -> Dict[str, Any]:
+def issue_refund(order_id: str = "", reason: str = "", ctx: Optional[ToolContext] = None, **kwargs) -> Dict[str, Any]:
     """Process a refund for an order."""
     if not order_id:
         return {"success": False, "error": "order_id is required"}
     if not reason:
         return {"success": False, "error": "reason is required"}
 
-    order = ORDERS_DB.get(order_id)
+    db = ctx.orders_db if ctx else ORDERS_DB
+    order = db.get(order_id)
     if not order:
         return {"success": False, "error": f"Order {order_id} not found"}
 
@@ -279,11 +287,15 @@ def issue_refund(order_id: str = "", reason: str = "", **kwargs) -> Dict[str, An
     if not order["return_eligible"]:
         return {"success": False, "error": "Order is not eligible for return/refund"}
 
-    if order["category"] in REFUND_POLICY["non_refundable_categories"]:
+    policy = ctx.refund_policy if ctx else REFUND_POLICY
+    if order["category"] in policy["non_refundable_categories"]:
         return {
             "success": False,
             "error": f"Items in category '{order['category']}' are non-refundable per company policy",
         }
+
+    if ctx:
+        ctx.refund_log[order_id] = True
 
     return {
         "success": True,
@@ -295,7 +307,7 @@ def issue_refund(order_id: str = "", reason: str = "", **kwargs) -> Dict[str, An
     }
 
 
-def check_policy(topic: str = "", **kwargs) -> Dict[str, Any]:
+def check_policy(topic: str = "", ctx: Optional[ToolContext] = None, **kwargs) -> Dict[str, Any]:
     """Look up company policy on a topic."""
     if not topic:
         return {"success": False, "error": "topic is required"}
@@ -349,7 +361,7 @@ def check_policy(topic: str = "", **kwargs) -> Dict[str, Any]:
     return result
 
 
-def escalate_to_human(reason: str = "", **kwargs) -> Dict[str, Any]:
+def escalate_to_human(reason: str = "", ctx: Optional[ToolContext] = None, **kwargs) -> Dict[str, Any]:
     """Escalate the case to a human agent."""
     if not reason:
         return {"success": False, "error": "reason is required"}
@@ -364,7 +376,7 @@ def escalate_to_human(reason: str = "", **kwargs) -> Dict[str, Any]:
     }
 
 
-def route_to_regional_team(language: str = "", reason: str = "", **kwargs) -> Dict[str, Any]:
+def route_to_regional_team(language: str = "", reason: str = "", ctx: Optional[ToolContext] = None, **kwargs) -> Dict[str, Any]:
     """Route the case to a specialized regional team."""
     if not language:
         return {"success": False, "error": "language is required"}
@@ -394,7 +406,7 @@ TOOL_REGISTRY = {
 }
 
 
-def call_tool(tool_name: str, tool_args: Dict[str, Any]) -> Dict[str, Any]:
+def call_tool(tool_name: str, tool_args: Dict[str, Any], ctx: Optional[ToolContext] = None) -> Dict[str, Any]:
     """Dispatch a tool call and return the result."""
     if tool_name not in TOOL_REGISTRY:
         return {
@@ -404,6 +416,6 @@ def call_tool(tool_name: str, tool_args: Dict[str, Any]) -> Dict[str, Any]:
 
     fn = TOOL_REGISTRY[tool_name]
     try:
-        return fn(**tool_args)
+        return fn(**tool_args, ctx=ctx)
     except Exception as e:
         return {"success": False, "error": f"Invalid arguments or tool execution failure for '{tool_name}': {e}"}

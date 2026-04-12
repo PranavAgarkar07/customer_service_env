@@ -14,21 +14,39 @@ description: >
   cross-cultural handoffs and non-refundable items requiring escalation.
 
 tasks:
-  - id: easy_order_status
-    description: Customer asks for order status and tracking — 1 tool needed
+  - id: order_status
+    description: Customer asks for order status and tracking
     difficulty: easy
-  - id: easy_order_cancel
-    description: Customer wants to cancel an unshipped order — 2 tools needed
+  - id: order_cancel
+    description: Customer wants to cancel an unshipped order
     difficulty: easy
-  - id: medium_refund_request
-    description: Customer requests a refund for defective item — 3 tools + sequence bonus
+  - id: refund_request
+    description: Customer requests a refund for defective item
     difficulty: medium
-  - id: hard_fraud_detection
-    description: Customer reports duplicate charge — 5+ tools, investigative reasoning
+  - id: fraud_duplicate
+    description: Customer reports duplicate charge
     difficulty: hard
-  - id: hard_non_refundable
+  - id: non_refundable
     description: Customer wants refund for digital download (non-refundable) — requires escalation
     difficulty: hard
-  - id: hard_multilingual
+  - id: multilingual
     description: Customer query in Spanish - requires routing to regional team
+    difficulty: hard
+  - id: easy_order_status
+    description: Legacy alias for order_status
+    difficulty: easy
+  - id: easy_order_cancel
+    description: Legacy alias for order_cancel
+    difficulty: easy
+  - id: medium_refund_request
+    description: Legacy alias for refund_request
+    difficulty: medium
+  - id: hard_fraud_detection
+    description: Legacy alias for fraud_duplicate
+    difficulty: hard
+  - id: hard_non_refundable
+    description: Legacy alias for non_refundable
+    difficulty: hard
+  - id: hard_multilingual
+    description: Legacy alias for multilingual
     difficulty: hard
