@@ -383,6 +383,10 @@ def route_to_regional_team(language: str = "", reason: str = "", ctx: Optional[T
     if not reason:
         return {"success": False, "error": "reason is required"}
 
+    if ctx:
+        # Populate routing_log so rubrics can verify routing occurred with the right language
+        ctx.routing_log["customer"] = language.lower()
+
     return {
         "success": True,
         "routing_id": "RTG-1234",
@@ -416,6 +420,11 @@ def call_tool(tool_name: str, tool_args: Dict[str, Any], ctx: Optional[ToolConte
 
     fn = TOOL_REGISTRY[tool_name]
     try:
-        return fn(**tool_args, ctx=ctx)
+        result = fn(**tool_args, ctx=ctx)
+        # Append raw args string to tool_args_log so rubrics can check order IDs used
+        if ctx:
+            import json
+            ctx.tool_args_log.append(json.dumps(tool_args))
+        return result
     except Exception as e:
         return {"success": False, "error": f"Invalid arguments or tool execution failure for '{tool_name}': {e}"}

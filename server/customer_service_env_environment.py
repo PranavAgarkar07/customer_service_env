@@ -188,7 +188,16 @@ class CustomerServiceEnvironment(Environment):
 
         # 5. Compute Terminal Reward on episode completion
         if done:
-            terminal_reward = self._reward_engine.compute_terminal_reward(self._scenario, self._ctx, self._state)
+            # Extract the agent's last text message for MessageQualityRubric scoring
+            final_message = ""
+            for msg in reversed(self._conversation):
+                if msg.get("role") == "agent" and msg.get("content"):
+                    final_message = msg["content"]
+                    break
+
+            terminal_reward = self._reward_engine.compute_terminal_reward(
+                self._scenario, self._ctx, self._state, final_message=final_message
+            )
             step_reward += terminal_reward
             self._state.resolved = terminal_reward > 0
 

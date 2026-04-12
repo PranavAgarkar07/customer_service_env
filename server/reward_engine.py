@@ -1,6 +1,11 @@
 from typing import Any, Dict, List, Set
 from typing_extensions import Protocol
 
+try:
+    from .rubrics import CustomerServiceRubric
+except ImportError:
+    from server.rubrics import CustomerServiceRubric
+
 
 class EpisodeStateProtocol(Protocol):
     step_count: int
@@ -26,8 +31,10 @@ class RewardEngine:
     - Intermediate rewards are small (0.02) to avoid reward hacking.
     - Correct-tool rewards (0.05) clearly outweigh incorrect-tool rewards (0.0)
       to provide gradient signal without over-specifying the sequence.
-    - Terminal reward is outcome-based + efficiency-scaled so the agent learns
-      to solve tasks in minimum steps.
+    - Terminal reward uses CustomerServiceRubric which verifies actual state
+      mutations (refund_log, routing_log) rather than just tool name coverage.
+      This makes the grading "actionable" — like calendar_env's SQL verifiers
+      and repl_env's ExactMatchRubric / FuzzyMatchRubric.
     - Partial credit on timeout prevents the cliff-edge reward problem where
       an agent doing everything right except the final step gets 0.
     """
@@ -69,18 +76,28 @@ class RewardEngine:
         scenario: ScenarioProtocol,
         ctx: Any,
         state: EpisodeStateProtocol,
+        final_message: str = "",
     ) -> float:
-        """Outcome-based terminal reward with efficiency scaling and partial credit.
+        """Outcome-based terminal reward using CustomerServiceRubric.
+
+        The rubric verifies actual state mutations (ctx.refund_log, ctx.routing_log)
+        rather than just checking tool names — this is the same pattern as:
+          - calendar_env: SQL verifiers check DB state after actions
+          - repl_env: ExactMatchRubric compares final_answer to expected_answer
 
         Returns:
-            - 0.5–1.0 scaled by efficiency if outcome was achieved
+            - 0.5–1.0 scaled by efficiency + rubric score if outcome was achieved
             - 0.05–0.25 partial credit if key required tools were used (timeout case)
             - 0.0 if neither outcome nor partial progress was made
         """
         outcome_achieved = scenario.terminal_state_check(ctx, state)
 
+        # Build and score the rubric (works even on timeout for partial credit)
+        rubric = CustomerServiceRubric.for_scenario(scenario)
+        rubric_score = rubric.score(ctx, state, scenario, final_message)
+
         if outcome_achieved:
-            # --- Full outcome: efficiency-scaled reward ---
+            # --- Full outcome: efficiency-scaled reward + rubric quality bonus ---
             steps_taken = state.step_count
             min_steps = scenario.minimum_steps
 
@@ -93,19 +110,20 @@ class RewardEngine:
             redundant_calls = max(0, len(tools_used) - len(required))
             redundancy_penalty = redundant_calls * 0.04
 
-            # Base reward 0.5 + efficiency bonus up to 0.5, minus redundancy
-            terminal = 0.5 + (0.5 * efficiency) - redundancy_penalty
+            # Base reward: efficiency (up to 0.8) + rubric quality bonus (up to 0.2)
+            terminal = (0.8 * efficiency) + (0.2 * rubric_score) - redundancy_penalty
             return max(0.15, terminal)  # floor to ensure success always pays
 
         # --- Partial credit: agent timed out but did useful work ---
-        # Reward proportional to how many required tools they actually called
+        # Use rubric's process score (sequence coverage) for partial credit
         required: List[str] = getattr(scenario, "required_tools", [])
         if required:
             tools_used_set: Set[str] = set(state.tools_called)
             required_set: Set[str] = set(required)
             coverage = len(tools_used_set & required_set) / len(required_set)
             if coverage > 0:
-                # Up to 0.2 partial credit, only if they were on the right track
-                return coverage * 0.2
+                # Blend tool coverage + rubric score for richer partial credit signal
+                partial = (coverage * 0.15) + (rubric_score * 0.05)
+                return min(0.2, partial)
 
         return 0.0

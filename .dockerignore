@@ -1,0 +1,31 @@
+# Virtual environment — rebuilt inside Docker
+.venv/
+
+# Git history — not needed in image
+.git/
+.gitignore
+
+# Development artifacts
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+*.pyc
+
+# Episode recordings / output files (large binary files)
+asyncio
+json
+graphify-out/
+
+# Secrets and local config
+.env
+.gemini/
+
+# Test files
+test_*.py
+validate-submission.sh
+
+# Docs
+README.md
+GEMINI.md

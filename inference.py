@@ -108,7 +108,7 @@ For DUPLICATE CHARGE / FRAUD issues (customer reports multiple charges):
   Step 3: check_order(second_order_id) — check second order details
   Step 4: Compare orders — look at product, price, timing, payment to confirm duplicate
   Step 5: issue_refund(duplicate_order_id, reason="duplicate charge") — refund the duplicate order
-  Step 6: ONLY NOW send a final message to the customer with words "duplicate", "refund", and the refunded order ID (e.g. ORD-5004)
+  Step 6: ONLY NOW send a final message to the customer with words "duplicate", "refund", and the refunded order ID (from tool result)
 
   ⚠️ CRITICAL: During steps 1-4, do NOT use the words "duplicate" or "refund" in your messages.
      Say things like "I'm investigating both charges" or "Let me compare the orders".
@@ -390,7 +390,7 @@ async def run_scenario(client: OpenAI, scenario_id: str) -> float:
             obs = result.observation
             tool_result = obs.tool_result
 
-            reward = result.reward or 0.0
+            reward = result.reward if result.reward is not None else 0.01
             rewards.append(reward)
             steps_taken = step
 
@@ -418,14 +418,12 @@ async def run_scenario(client: OpenAI, scenario_id: str) -> float:
             if result.done:
                 break
 
-        # Compute final score: sum of yielded step rewards.
-        # Apply safe_reward logic to mirror what the environment yields:
-        # negative sums are shifted by +0.5 before clamping to (0.01, 0.99).
+        # Final score = sum of per-step rewards emitted by the environment.
+        # Each step reward was already safe_reward-clamped to (0.01, 0.99) by the env.
+        # We just need to clamp the total to (0.01, 0.99) for the [END] line.
         raw_score = sum(rewards)
-        if raw_score < 0:
-            raw_score = 0.5 + raw_score
         total_score = max(0.01, min(0.99, raw_score))
-        success = total_score >= 0.3
+        success = total_score >= 0.5  # raised threshold: success means actually resolved
 
     except Exception as e:
         import sys
