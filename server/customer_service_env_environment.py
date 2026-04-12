@@ -19,15 +19,13 @@ from openenv.core.env_server.interfaces import Environment
 
 
 def safe_reward(r: float) -> float:
-    """Map any raw step reward to a value strictly inside (0.01, 0.99).
+    """Map any raw reward to strictly inside (0.01, 0.99).
 
-    Per OpenEnv Phase 2 validation rules every individual step reward must be
-    a floating-point number in the open interval (0, 1).
-    Negative rewards (penalties) are first shifted into a positive range by
-    adding 0.5 so that a penalty of -0.05 becomes 0.45 instead of -0.05.
+    Per OpenEnv Phase 2 rules every step reward must be in open interval (0, 1).
+    Negative rewards are shifted: penalty of -0.05 → 0.45.
     """
     if r < 0:
-        r = 0.5 + r   # shift: -0.05 → 0.45, -0.03 → 0.47, -0.5 → 0.0 (then clamped up)
+        r = 0.5 + r  # shift so -0.5 → 0.0 (then clamped up to 0.01)
     return max(0.01, min(0.99, r))
 
 try:
@@ -86,7 +84,6 @@ class CustomerServiceEnvironment(Environment):
         self._reward_engine: Optional[RewardEngine] = None
         self._conversation: List[Dict[str, str]] = []
         self._total_reward: float = 0.0
-        self._yielded_reward: float = 0.0
 
     def reset(
         self,
@@ -102,7 +99,6 @@ class CustomerServiceEnvironment(Environment):
 
         self._conversation = []
         self._total_reward = 0.0
-        self._yielded_reward = 0.0
 
         ep_id = episode_id or str(uuid4())
         self._state = CustomerServiceState(
@@ -118,6 +114,19 @@ class CustomerServiceEnvironment(Environment):
             "content": self._scenario.customer_query,
         })
 
+        # Build a scenario-aware feedback hint for the first turn
+        # This surfaces the scenario type explicitly so the agent selects the right workflow
+        scenario_hints = {
+            "order_status":    "WORKFLOW: This is an ORDER STATUS check. Call check_order only.",
+            "order_cancel":    "WORKFLOW: This is an ORDER CANCELLATION request. Call check_order then check_policy.",
+            "refund_request":  "WORKFLOW: This is a REFUND REQUEST. Call verify_user → check_order → issue_refund.",
+            "fraud_duplicate": "WORKFLOW: This is a DUPLICATE CHARGE / FRAUD case. Call verify_user → check_order (x2) → issue_refund.",
+            "non_refundable":  "WORKFLOW: This is a NON-REFUNDABLE item complaint. Call verify_user → check_order → check_policy → issue_refund (will fail) → escalate_to_human.",
+            "multilingual":    f"WORKFLOW: ⚠️ MULTILINGUAL CUSTOMER — language: {self._scenario.language}. Call verify_user → check_order → route_to_regional_team. Do NOT attempt refunds. Route immediately after checking order.",
+        }
+        hint = scenario_hints.get(self._scenario.scenario_type, "")
+        feedback_msg = f"New ticket from {self._scenario.customer_name}. Difficulty: {self._scenario.difficulty}. {hint}"
+
         return CustomerServiceObservation(
             done=False,
             reward=0.0,
@@ -127,7 +136,7 @@ class CustomerServiceEnvironment(Environment):
             available_tools=AVAILABLE_TOOLS,
             scenario_id=self._scenario.scenario_type,
             difficulty=self._scenario.difficulty,
-            feedback=f"New ticket from {self._scenario.customer_name}. Difficulty: {self._scenario.difficulty}.",
+            feedback=feedback_msg,
             steps_taken=0,
             max_steps=self.MAX_STEPS,
         )
@@ -153,9 +162,11 @@ class CustomerServiceEnvironment(Environment):
                 "content": f"[Tool: {action.tool_name}] Args: {action.tool_args} -> Result: {tool_result}",
             })
             
-            # Simple state updates needed for escalations
+            # Simple state updates needed for escalations and routing
             if action.tool_name == "escalate_to_human":
                 self._state.escalated = True
+            elif action.tool_name == "route_to_regional_team":
+                self._state.routed = True
             elif action.tool_name == "verify_user" and tool_result.get("success"):
                 self._state.user_verified = True
             
@@ -172,7 +183,7 @@ class CustomerServiceEnvironment(Environment):
             action, tool_result or {}, self._state, required_tools=required_tools
         )
 
-        # 4. Check Terminal State 
+        # 4. Check Terminal State
         done = self._check_done_state_based()
 
         # 5. Compute Terminal Reward on episode completion
@@ -180,26 +191,22 @@ class CustomerServiceEnvironment(Environment):
             terminal_reward = self._reward_engine.compute_terminal_reward(self._scenario, self._ctx, self._state)
             step_reward += terminal_reward
             self._state.resolved = terminal_reward > 0
-            
+
             feedback_parts.append(f"Episode complete. Outcome {'ACHIEVED' if self._state.resolved else 'FAILED'}.")
             feedback_parts.append(f"Steps: {self._state.step_count}/{self.MAX_STEPS}")
 
-        # Update cumulative reward (clamp to [-0.5, 1.0])
+        # Update cumulative tracker (used only for partial_score metadata)
         self._total_reward += step_reward
-        self._total_reward = max(self._total_reward, -0.5)
-        self._total_reward = min(self._total_reward, 0.999) 
-        self._state.partial_score = max(self._total_reward, 0.0)
+        self._total_reward = max(-0.5, min(0.999, self._total_reward))
+        self._state.partial_score = max(0.0, self._total_reward)
 
-        # Enforce strict open-bound (0.01, 0.99)
-        target_total_yielded = max(0.01, min(0.99, self._total_reward)) if done else self._total_reward
-        raw_delta = target_total_yielded - getattr(self, '_yielded_reward', 0.0)
-        
-        step_reward_to_yield = safe_reward(raw_delta)
-        self._yielded_reward = getattr(self, '_yielded_reward', 0.0) + step_reward_to_yield
+        # Yield a per-step reward that is strictly in (0, 1) per OpenEnv spec.
+        # safe_reward handles shift of negatives and clamps to [0.01, 0.99].
+        reward_to_yield = safe_reward(step_reward)
 
         return CustomerServiceObservation(
             done=done,
-            reward=round(step_reward_to_yield, 4),
+            reward=round(reward_to_yield, 4),
             customer_query=self._scenario.customer_query if self._scenario else "",
             conversation_history=list(self._conversation),
             tool_result=tool_result,

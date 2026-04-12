@@ -105,6 +105,7 @@ class CustomerServiceState(State):
     difficulty: str = ""
     resolved: bool = False
     escalated: bool = False
+    routed: bool = False       # True after route_to_regional_team is called
     user_verified: bool = False
     tools_called: List[str] = Field(default_factory=list)
     partial_score: float = 0.0

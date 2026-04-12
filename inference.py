@@ -124,12 +124,18 @@ For NON-REFUNDABLE ITEM complaints (digital products, gift cards):
   Step 6: message explaining the item is non-refundable, it's a digital product, and the case has been escalated
   (You MUST attempt the refund even if you suspect it will fail — this is required)
 
-For NON-ENGLISH / MULTILINGUAL customers:
-  Step 1: verify_user(user_id) — verify identity first
-  Step 2: check_order(order_id) — check their order
-  Step 3: route_to_regional_team(language, reason) — route to the right team
-  Step 4: message in their language mentioning "regional" or "transfer"
-  (ALWAYS verify and check order BEFORE routing — do NOT route immediately)
+For NON-ENGLISH / MULTILINGUAL customers (HIGHEST PRIORITY RULE):
+  HOW TO DETECT: The customer query contains non-English words, or greetings like:
+    "Hola", "Bonjour", "こんにちは", "مرحبا", "Привет", "你好", "Olá", "Namaste"
+    or any foreign-language text mixed into the message.
+  WHAT TO DO — strictly follow this 3-step sequence:
+  Step 1: verify_user(user_id) — extract the user ID from the query and verify
+  Step 2: check_order(order_id) — extract the order ID from the query and check
+  Step 3: route_to_regional_team(language=<detected_language>, reason=<reason>) — MUST call this to complete the task
+  ⚠️ CRITICAL: route_to_regional_team is the FINAL and REQUIRED action. The episode ends when you call it.
+  ⚠️ NEVER loop on messages after routing. The episode is over after route_to_regional_team.
+  ⚠️ Do NOT attempt refunds, policies, or escalations for multilingual customers — just route.
+  ⚠️ Do NOT reply multiple times in their language — route immediately after verifying user and order.
 
 Available Tools:
 - verify_user(user_id: str)
@@ -153,6 +159,7 @@ ANTI-LOOP RULES:
 - If you sent a message and the episode didn't end, you MUST call a tool next.
 - After checking orders in fraud/duplicate cases, proceed to check_policy then issue_refund.
 - Never send the same message twice. If stuck, try a different tool or escalate.
+- For multilingual: if you already called route_to_regional_team, do NOT send any more messages. Stop.
 """).strip()
 
 
@@ -203,9 +210,16 @@ def _call_llm_sync(
     conversation: List[Dict[str, str]],
     tool_result: Optional[Dict[str, Any]],
     feedback: str,
+    customer_query: str = "",
 ) -> Dict[str, Any]:
     """Synchronous LLM call — runs in a thread pool to keep asyncio free."""
-    user_content = f"Environment feedback: {feedback}\n"
+    # Pin the customer's original query at the top so it's never lost to history truncation.
+    # This is critical for scenarios like multilingual where the agent must see the non-English
+    # text to decide the workflow, even on step 5+.
+    user_content = ""
+    if customer_query:
+        user_content += f"CUSTOMER ORIGINAL MESSAGE: {customer_query}\n\n"
+    user_content += f"Environment feedback: {feedback}\n"
     if tool_result:
         user_content += f"Last tool result: {json.dumps(tool_result)}\n"
     user_content += "\nConversation so far:\n"
@@ -253,6 +267,7 @@ async def get_agent_action(
     conversation: List[Dict[str, str]],
     tool_result: Optional[Dict[str, Any]],
     feedback: str,
+    customer_query: str = "",
 ) -> Dict[str, Any]:
     """Ask the LLM to decide the next action (async wrapper to keep WS alive).
 
@@ -271,6 +286,7 @@ async def get_agent_action(
                 conversation,
                 tool_result,
                 feedback,
+                customer_query,
             ),
             timeout=60.0,  # Give up and return a safe fallback after 60s
         )
@@ -346,6 +362,8 @@ async def run_scenario(client: OpenAI, scenario_id: str) -> float:
         result = await env.reset(scenario_id=scenario_id)
         obs = result.observation
         tool_result = None
+        # Cache the original customer query — pinned in LLM prompt on every step
+        customer_query = obs.customer_query or ""
 
         for step in range(1, MAX_STEPS + 1):
             if result.done:
@@ -357,6 +375,7 @@ async def run_scenario(client: OpenAI, scenario_id: str) -> float:
                 obs.conversation_history,
                 tool_result,
                 obs.feedback,
+                customer_query,
             )
 
             # Build action
