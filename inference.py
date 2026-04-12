@@ -62,7 +62,7 @@ ENV_BASE_URL = os.getenv("ENV_BASE_URL", "http://localhost:8000")
 BENCHMARK = "customer_service_env"
 MAX_STEPS = 12
 TEMPERATURE = 0.1
-MAX_TOKENS = 300
+MAX_TOKENS = 512
 
 SCENARIOS = [
     "easy_order_status",
@@ -242,7 +242,8 @@ def _call_llm_sync(
         return json.loads(raw)
 
     except (json.JSONDecodeError, Exception) as e:
-        print(f"[DEBUG] LLM parse error: {e}", flush=True)
+        import sys
+        print(f"[DEBUG] LLM parse error: {e}", flush=True, file=sys.stderr)
         return {"tool_name": None, "tool_args": {}, "message": "I apologize, let me help you."}
 
 
@@ -399,9 +400,11 @@ async def run_scenario(client: OpenAI, scenario_id: str) -> float:
         success = total_score >= 0.3
 
     except Exception as e:
-        print(f"[DEBUG] Scenario error: {e}", flush=True)
+        import sys
+        print(f"[DEBUG] Scenario error: {e}", flush=True, file=sys.stderr)
         success = False
-        total_score = 0.0
+        # Clamp to 0.01 — never emit score=0.0 (fails Phase 2 open-interval check)
+        total_score = max(0.01, min(0.99, sum(rewards))) if rewards else 0.01
 
     finally:
         # Disconnect first, then emit [END] — spec: "after env.close(), always emitted"
@@ -422,29 +425,30 @@ async def main() -> None:
     Each scenario gets its own fresh WebSocket connection (see run_scenario).
     The Docker container at ENV_BASE_URL must already be running.
     """
+    import sys
     client = OpenAI(base_url=API_BASE_URL, api_key=API_KEY)
 
     # Verify the environment server is reachable before starting
-    print(f"Connecting to environment at: {ENV_BASE_URL}", flush=True)
-    print(f"Using model: {MODEL_NAME} via {API_BASE_URL}", flush=True)
+    print(f"Connecting to environment at: {ENV_BASE_URL}", flush=True, file=sys.stderr)
+    print(f"Using model: {MODEL_NAME} via {API_BASE_URL}", flush=True, file=sys.stderr)
 
     scores = {}
     for scenario_id in SCENARIOS:
-        print(f"\n{'='*60}", flush=True)
-        print(f"Running scenario: {scenario_id}", flush=True)
-        print(f"{'='*60}", flush=True)
+        print(f"\n{'='*60}", flush=True, file=sys.stderr)
+        print(f"Running scenario: {scenario_id}", flush=True, file=sys.stderr)
+        print(f"{'='*60}", flush=True, file=sys.stderr)
 
         score = await run_scenario(client, scenario_id)
         scores[scenario_id] = score
 
-    # Print summary
-    print(f"\n{'='*60}", flush=True)
-    print("FINAL SUMMARY", flush=True)
-    print(f"{'='*60}", flush=True)
+    # Print summary to stderr — stdout must contain ONLY [START]/[STEP]/[END] lines
+    print(f"\n{'='*60}", flush=True, file=sys.stderr)
+    print("FINAL SUMMARY", flush=True, file=sys.stderr)
+    print(f"{'='*60}", flush=True, file=sys.stderr)
     for sid, score in scores.items():
-        print(f"  {sid}: {score:.3f}", flush=True)
+        print(f"  {sid}: {score:.3f}", flush=True, file=sys.stderr)
     avg = sum(scores.values()) / len(scores) if scores else 0.0
-    print(f"  Average: {avg:.3f}", flush=True)
+    print(f"  Average: {avg:.3f}", flush=True, file=sys.stderr)
 
 
 if __name__ == "__main__":
