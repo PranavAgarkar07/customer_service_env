@@ -352,9 +352,9 @@ async def run_scenario(client: OpenAI, scenario_id: str) -> float:
 
             # Build action
             action = CustomerServiceAction(
-                tool_name=action_dict.get("tool_name"),
-                tool_args=action_dict.get("tool_args", {}),
-                message=action_dict.get("message", ""),
+                tool_name=action_dict.get("tool_name") or None,
+                tool_args=action_dict.get("tool_args") or {},
+                message=action_dict.get("message") or "",  # LLM may return null; coerce to ""
             )
 
             # Execute step
