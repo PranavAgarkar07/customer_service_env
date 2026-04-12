@@ -273,19 +273,8 @@ class ScenarioGenerator:
             query = queries[0]
             req_tools = ["verify_user", "check_order", "route_to_regional_team"]
             min_steps = 3
-            # Two-tier terminal check:
-            # - Primary: route_to_regional_team called (correct behavior, full reward)
-            # - Fallback: verify + check_order done (avoids 12-step loops with small models)
             def check_route_term(c: ToolContext, state: Any) -> bool:
-                if "route_to_regional_team" in state.tools_called:
-                    return True
-                # Fallback: if agent verified + checked but hasn't called route yet,
-                # end episode after 4 steps to prevent infinite looping
-                verified_and_checked = (
-                    "verify_user" in state.tools_called and
-                    "check_order" in state.tools_called
-                )
-                return verified_and_checked and state.step_count >= 4
+                return bool(getattr(c, 'routing_log', {}))
             term_check = check_route_term
             res_keywords = [cust["lang"], "transfer", "regional"]
             diff = "hard"
