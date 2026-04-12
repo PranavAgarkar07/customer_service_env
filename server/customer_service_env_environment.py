@@ -19,14 +19,23 @@ from openenv.core.env_server.interfaces import Environment
 
 
 def safe_reward(r: float) -> float:
-    """Map any raw reward to strictly inside (0.01, 0.99).
+    """Map any raw reward to strictly inside (0.01, 0.99) using linear scaling.
 
-    Per OpenEnv Phase 2 rules every step reward must be in open interval (0, 1).
-    Negative rewards are shifted: penalty of -0.05 → 0.45.
+    Maps the expected raw reward range [-0.5, 1.5] → [0.01, 0.99] linearly,
+    preserving relative ordering so penalties stay LOW and successes stay HIGH.
+
+    Examples:
+        -0.05 (penalty)       → ~0.14  (low, as intended)
+         0.00 (no-op)         → ~0.25  (near floor)
+         0.05 (correct tool)  → ~0.27  (slightly above no-op)
+         0.85 (terminal win)  → ~0.83  (high)
+         1.05 (perfect win)   → ~0.94  (near ceiling)
     """
-    if r < 0:
-        r = 0.5 + r  # shift so -0.5 → 0.0 (then clamped up to 0.01)
-    return max(0.01, min(0.99, r))
+    # Clamp to expected raw range first
+    r = max(-0.5, min(1.5, r))
+    # Linear map: [-0.5, 1.5] → [0.01, 0.99]
+    mapped = 0.01 + (r + 0.5) / 2.0 * 0.98
+    return round(max(0.01, min(0.99, mapped)), 4)
 
 try:
     from ..models import (
