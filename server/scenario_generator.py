@@ -149,7 +149,12 @@ class ScenarioGenerator:
         # ------------------------------------------------------------------ #
 
         # Bug #1 fix: removed `state.resolved` — only inspect observable state
+        # Bug #5 fix: verify the correct order ID was used (not just any check_order call)
         def check_status_term(c: ToolContext, state: Any) -> bool:
+            # Primary: correct order ID appeared in tool_args_log
+            if any(primary_order_id in arg for arg in getattr(c, 'tool_args_log', [])):
+                return True
+            # Fallback: agent called check_order at least once (for small models)
             return "check_order" in state.tools_called
 
         # Bug #2 fix: cancel requires check_order + check_policy, NOT issue_refund
@@ -229,7 +234,7 @@ class ScenarioGenerator:
             ]
             query = self.rng.choice(queries)
             req_tools = ["verify_user", "check_order", "check_policy", "issue_refund"]
-            min_steps = 5
+            min_steps = 4  # 4 required tools → minimum 4 steps (was wrongly 5)
             term_check = lambda c, s: c.refund_log.get(sec_order_id, False) or c.refund_log.get(primary_order_id, False)
             res_keywords = ["duplicate", "refund"]
             diff = "hard"

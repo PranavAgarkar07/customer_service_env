@@ -165,12 +165,19 @@ class CustomerServiceEnvironment(Environment):
         if action.tool_name:
             tool_result = call_tool(action.tool_name, action.tool_args, ctx=self._ctx)
             self._state.tools_called.append(action.tool_name)
-            
+
+            # Populate tool_args_log so rubrics (e.g. OrderStatusRubric) can verify
+            # that the agent used the CORRECT order/user IDs — not just called the right tool
+            import json as _json
+            self._ctx.tool_args_log.append(
+                _json.dumps({"tool": action.tool_name, "args": action.tool_args})
+            )
+
             self._conversation.append({
                 "role": "system",
                 "content": f"[Tool: {action.tool_name}] Args: {action.tool_args} -> Result: {tool_result}",
             })
-            
+
             # Simple state updates needed for escalations and routing
             if action.tool_name == "escalate_to_human":
                 self._state.escalated = True
@@ -178,7 +185,7 @@ class CustomerServiceEnvironment(Environment):
                 self._state.routed = True
             elif action.tool_name == "verify_user" and tool_result.get("success"):
                 self._state.user_verified = True
-            
+
             feedback_parts.append(f"Tool '{action.tool_name}' executed.")
 
         # 2. Process Agent Message
