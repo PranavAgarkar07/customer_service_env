@@ -21,3 +21,9 @@ Thumbs.db
 
 # Lock file (optional — remove this line if you want reproducible builds)
 # uv.lock
+outputs/
+
+# Shadow files — NEVER commit these, they shadow Python stdlib modules
+/asyncio
+/json
+graphify-out/
